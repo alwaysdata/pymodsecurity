@@ -28,6 +28,10 @@ class FileOpeningError(ModSecurityException):
     Error raised when the C interface fails to open a file
     """
     default_message = "File cannot be opened"
+    # Another might append: the file has been opened 
+    # but the rules merge() failed returning -1
+    #
+    # Simply raise an IOError ?
 
 
 class FetchRemoteFileError(ModSecurityException):
@@ -43,3 +47,21 @@ class RuleWrittingError(ModSecurityException):
     to current rules instance
     """
     default_message = "Rule(s) cannot be written"
+
+
+class ProcessConnectionError(ModSecurityException):
+    """
+    Error raised when the C interface fails to perfom
+    the analysis on the connection.
+    """
+    default_message = "Failed to perform connection analysis"
+    # Maybe it'd be useful to mention the fail location
+    # e.g. "Failed on (request|response (header|body))"
+
+
+class LoggingActionError(ModSecurityException):
+    """
+    Error raised when the C interface fails to log
+    all information realtive to a transaction.
+    """
+    default_message = "Fail to log information about the transaction"
