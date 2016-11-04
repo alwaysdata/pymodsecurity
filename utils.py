@@ -24,3 +24,10 @@ def native(s, encoding):
         raise TypeError("%r is neither bytes nor unicode" % s)
 
     return s.decode(encoding)
+
+
+def encode_string(s, encoding="utf-8"):
+    """
+    Helper for encoding string.
+    """
+    return s.encode(encoding)
