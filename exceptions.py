@@ -63,6 +63,21 @@ class FeedingError(ProcessConnectionError):
     default_message = "Failed to feed modsecurity"
 
 
+class EmptyBodyError(Exception):
+    """
+    Error raised when a HTTP body is empty.
+    """
+    default_message = "Body is empty"
+
+
+class BodyNotUpdated(Exception):
+    """
+    Error raised when the C interface returns 0 after
+    checking if response body has been updated.
+    """
+    default_message = "Body has not been updated"
+
+
 class LoggingActionError(Exception):
     """
     Error raised when the C interface fails to log
