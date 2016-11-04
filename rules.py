@@ -4,9 +4,11 @@
 import modsecurity.utils as utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
+from modsecurity.exceptions import InternalModsecurityError
 from modsecurity.exceptions import FileOpeningError
-from modsecurity.exceptions import FetchRemoteFileError
-from modsecurity.exceptions import RuleWrittingError
+from modsecurity.exceptions import RuleWritingError
+
+NULL = _ffi.NULL
 
 
 class Rules:
@@ -15,16 +17,22 @@ class Rules:
     """
     def __init__(self,):
         _rules_set = _lib.msc_create_rules_set()
-        assert _rules_set != _ffi.NULL
+        assert _rules_set != NULL
         _rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
 
         self._rules_set = _rules_set
-        self._error_pointer = _ffi.new('const char **', _ffi.NULL)
+        self._error_pointer = _ffi.new('const char **', NULL)
 
     def dump_rules(self):
-        return _lib.msc_rules_dump(self._rules_set)
+        _lib.msc_rules_dump(self._rules_set)
 
     def merge_rules(self, other_rules):
+        """
+        Merging a rules set into another one.
+        This function is implicitly called when an add_*() is called.
+
+        Return the number of rules merged.
+        """
         return _lib.msc_rules_merge(self._rules_set,
                                     other_rules._rules_set)
 
@@ -33,30 +41,30 @@ class Rules:
         Fetch rules over a network and merge it
         with the current rules set.
         """
-        key = bytes(key.encode())
-        uri = bytes(uri.encode())
+        key = utils.encode_string(key)
+        uri = utils.encode_string(uri)
         value = _lib.msc_rules_add_remote(self._rules_set,
                                           key,
                                           uri,
                                           self._error_pointer)
         if value == -1:
-            # Have to find a better place to call ModSecurity internal error
             error_message = utils.text(self._error_pointer[0])
+            self._error_pointer[0] = NULL
             if error_message:
-                print("ModSecurity Error -->", error_message)
+                raise InternalModsecurityError(error_message)
             else:
-                raise FetchRemoteFileError
+                raise FileOpeningError
 
     def add_rules_file(self, filename):
-        filename = bytes(filename.encode())
+        filename = utils.encode_string(filename)
         value = _lib.msc_rules_add_file(self._rules_set,
                                         filename,
                                         self._error_pointer)
         if value == -1:
-            # idem add_remote_rules() error handling
             error_message = utils.text(self._error_pointer[0])
+            self._error_pointer[0] = NULL
             if error_message:
-                print("ModSecurity Error -->", error_message)
+                raise InternalModsecurityError(error_message)
             else:
                 raise FileOpeningError
 
@@ -65,17 +73,17 @@ class Rules:
         Add custom rule defined by `plain rules` and merge
         it with the current rules set.
         """
-        plain_rules = bytes(plain_rules.encode())
+        plain_rules = utils.encode_string(plain_rules)
         value = _lib.msc_rules_add(self._rules_set,
                                    plain_rules,
                                    self._error_pointer)
         if value == -1:
-            # idem add_remote_rules() error handling
             error_message = utils.text(self._error_pointer[0])
+            self._error_pointer[0] = NULL
             if error_message:
-                print("ModSecurity Error -->", error_message)
+                raise InternalModsecurityError(error_message)
             else:
-                raise RuleWrittingError
+                raise RuleWritingError
 
 
 if __name__ == '__main__':
