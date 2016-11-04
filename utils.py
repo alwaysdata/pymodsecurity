@@ -18,9 +18,9 @@ def native(s, encoding):
     :py:class:`str` type, using UTF-8 encoding if conversion is necessary.
     :raise UnicodeError: The input string is not UTF-8 decodeable.
     :raise TypeError: The input is neither :py:class:`bytes` nor
-        :py:class:`unicode`.
+    :py:class:`unicode`.
     """
     if type(s)is not(str and bytes):
         raise TypeError("%r is neither bytes nor unicode" % s)
 
-    return s.encode(encoding)
+    return s.decode(encoding)
