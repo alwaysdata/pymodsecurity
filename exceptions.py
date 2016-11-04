@@ -21,13 +21,6 @@ class InternalModsecurityError(Exception):
     """
 
 
-class InputError(Exception):
-    """
-    Input argument has not the right type.
-    """
-    raise ValueError
-
-
 class FileOpeningError(Exception):
     """
     Error raised when the C interface fails to open a file
