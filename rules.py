@@ -43,11 +43,11 @@ class Rules:
         """
         key = utils.encode_string(key)
         uri = utils.encode_string(uri)
-        value = _lib.msc_rules_add_remote(self._rules_set,
-                                          key,
-                                          uri,
-                                          self._error_pointer)
-        if value == -1:
+        retvalue = _lib.msc_rules_add_remote(self._rules_set,
+                                             key,
+                                             uri,
+                                             self._error_pointer)
+        if retvalue == -1:
             error_message = utils.text(self._error_pointer[0])
             self._error_pointer[0] = NULL
             if error_message:
@@ -57,10 +57,10 @@ class Rules:
 
     def add_rules_file(self, filename):
         filename = utils.encode_string(filename)
-        value = _lib.msc_rules_add_file(self._rules_set,
-                                        filename,
-                                        self._error_pointer)
-        if value == -1:
+        retvalue = _lib.msc_rules_add_file(self._rules_set,
+                                           filename,
+                                           self._error_pointer)
+        if retvalue == -1:
             error_message = utils.text(self._error_pointer[0])
             self._error_pointer[0] = NULL
             if error_message:
@@ -74,10 +74,10 @@ class Rules:
         it with the current rules set.
         """
         plain_rules = utils.encode_string(plain_rules)
-        value = _lib.msc_rules_add(self._rules_set,
-                                   plain_rules,
-                                   self._error_pointer)
-        if value == -1:
+        retvalue = _lib.msc_rules_add(self._rules_set,
+                                      plain_rules,
+                                      self._error_pointer)
+        if retvalue == -1:
             error_message = utils.text(self._error_pointer[0])
             self._error_pointer[0] = NULL
             if error_message:
