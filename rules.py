@@ -1,14 +1,13 @@
 #! python3
 # coding: utf-8
 
-import modsecurity.utils as utils
+from modsecurity import utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
-from modsecurity.exceptions import InternalModsecurityError
-from modsecurity.exceptions import FileOpeningError
-from modsecurity.exceptions import RuleWritingError
+from modsecurity.exceptions import InternalError
 
-NULL = _ffi.NULL
+
+_NULL = _ffi.NULL
 
 
 class Rules:
@@ -17,11 +16,23 @@ class Rules:
     """
     def __init__(self,):
         _rules_set = _lib.msc_create_rules_set()
-        assert _rules_set != NULL
+        assert _rules_set != _NULL
         _rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
 
         self._rules_set = _rules_set
-        self._error_pointer = _ffi.new('const char **', NULL)
+        self._error_pointer = _ffi.new('const char **', _NULL)
+
+    def get_error_message(self, error_pointer):
+        """
+        Retrieve error string pointed by error_pointer.
+        This string is issued by libmodsecurity.
+        """
+        error_message = utils.text(error_pointer[0])
+        if not error_message:
+            error_message = "No information provided by libmodsecurity"
+
+        error_pointer[0] = _NULL
+        return error_message
 
     def dump_rules(self):
         _lib.msc_rules_dump(self._rules_set)
@@ -29,7 +40,6 @@ class Rules:
     def merge_rules(self, other_rules):
         """
         Merging a rules set into another one.
-        This function is implicitly called when an add_*() is called.
 
         Return the number of rules merged.
         """
@@ -48,12 +58,8 @@ class Rules:
                                              uri,
                                              self._error_pointer)
         if retvalue == -1:
-            error_message = utils.text(self._error_pointer[0])
-            self._error_pointer[0] = NULL
-            if error_message:
-                raise InternalModsecurityError(error_message)
-            else:
-                raise FileOpeningError
+            message = self.get_error_message(self._error_pointer)
+            raise InternalError(message)
 
     def add_rules_file(self, filename):
         filename = utils.encode_string(filename)
@@ -61,12 +67,8 @@ class Rules:
                                            filename,
                                            self._error_pointer)
         if retvalue == -1:
-            error_message = utils.text(self._error_pointer[0])
-            self._error_pointer[0] = NULL
-            if error_message:
-                raise InternalModsecurityError(error_message)
-            else:
-                raise FileOpeningError
+            message = self.get_error_message(self._error_pointer)
+            raise InternalError(message)
 
     def add_rules(self, plain_rules):
         """
@@ -78,12 +80,8 @@ class Rules:
                                       plain_rules,
                                       self._error_pointer)
         if retvalue == -1:
-            error_message = utils.text(self._error_pointer[0])
-            self._error_pointer[0] = NULL
-            if error_message:
-                raise InternalModsecurityError(error_message)
-            else:
-                raise RuleWritingError
+            message = self.get_error_message(self._error_pointer)
+            raise InternalError(message)
 
 
 if __name__ == '__main__':
@@ -100,12 +98,8 @@ if __name__ == '__main__':
     x.add_rules_file(filename)
     print('Adding remote rules file...', flush=True)
     y.add_remote_rules(key, uri)
-    print('Merging rules...', flush=True)
-    x.merge_rules(y)
     print('Dumping rules...', flush=True)
     x.dump_rules()
-    print('Cleaning rules...', flush=True)
-    x.cleanup_rules()
     print('\nTrying to dump rules again # 1...', flush=True)
     x.dump_rules()
     print('\nAdding rules file with bad path...', flush=True)
