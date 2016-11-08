@@ -1,51 +1,38 @@
-#! python3
 # coding: utf-8
 
 import os
 
-import modsecurity.utils as utils
+from modsecurity import utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
-from modsecurity.exceptions import ProcessConnectionError
-from modsecurity.exceptions import FeedingError
-from modsecurity.exceptions import EmptyBodyError
-from modsecurity.exceptions import BodyNotUpdated
-from modsecurity.exceptions import LoggingActionError
+from modsecurity.exceptions import (ProcessConnectionError,
+                                    FeedingError,
+                                    BodyNotUpdated,
+                                    LoggingActionError)
 
-NULL = _ffi.NULL
+
+_NULL = _ffi.NULL
 
 
 class Transaction:
     """
     Wrapper for C function built from transaction.h via CFFI.
     """
-    def __init__(self, ModSecurity, Rules):
-        self.null = NULL
-        if ModSecurity and Rules:  # prefer use of `assert` ?
-            self._modsecurity = ModSecurity._modsecurity_struct
-            self._rules = Rules._rules_set
-            self._log_callback = NULL  # _log_callback has to be properly defined if needed (maybe fetch it from modsecurity.py ?)
-            _charp = _ffi.new("char *")
-            self._intervention = _ffi.new("ModSecurityIntervention *",
-                                          [0, 0, _charp, _charp, 0])
+    def __init__(self, modsecurity, rules):
+        self._modsecurity = modsecurity
+        self._rules = rules
+        self._log_callback = _NULL  # _log_callback has to be properly defined if needed (maybe fetch it from modsecurity.py ?)
+        _charp1 = _ffi.new("char *")
+        _charp2 = _ffi.new("char *")
+        self._intervention = _ffi.new("ModSecurityIntervention *",
+                                      [0, 0, _charp1, _charp2, 0])
 
-            _transaction_struct = _lib.msc_new_transaction(self._modsecurity,
-                                                           self._rules,
-                                                           self._log_callback)
-            assert(_transaction_struct != NULL)
-            self._transaction_struct = _ffi.gc(_transaction_struct,
-                                               _lib.msc_transaction_cleanup)
-
-    def check_cffi_return_value(self,
-                                returned_value,
-                                error_value_expected,
-                                error_to_raise):
-        """
-        Maybe a futur feature which simply checks the returning value
-        obtained by a call to cffi lib.
-        """
-        if returned_value == error_value_expected:
-            raise error_to_raise
+        _transaction_struct = _lib.msc_new_transaction(self._modsecurity._modsecurity_struct,
+                                                       self._rules._rules_set,
+                                                       self._log_callback)
+        assert _transaction_struct != _NULL
+        self._transaction_struct = _ffi.gc(_transaction_struct,
+                                           _lib.msc_transaction_cleanup)
 
     def process_connection(self, client_ip, client_port,
                            server_ip, server_port):
@@ -63,8 +50,8 @@ class Transaction:
         server_ip Server's IP address in text format.
         server_port Server's port
         """
-        client_ip = utils.encode_string(client_ip)
-        server_ip = utils.encode_string(server_ip)
+        client_ip = client_ip.encode()
+        server_ip = server_ip.encode()
 
         retvalue = _lib.msc_process_connection(self._transaction_struct,
                                                client_ip,
@@ -73,8 +60,6 @@ class Transaction:
                                                server_port)
         if not retvalue:
             raise ProcessConnectionError.failed_at("connection")
-
-        self.has_intervention(self._intervention)
 
     def process_uri(self, uri, method, http_version):
         """
@@ -85,22 +70,14 @@ class Transaction:
         of a request process, it is expected to be executed
         prior to the virtual host resolution, when the
         connection arrives on the server.
+
+        `http_version` must be '1.0' or '1.1' or '2.0' since
+        value consistency is not checked (same goes for `method`).
         """
-        if (method == 'GET' or method == 'POST' or method == 'PUT'):
-            method = utils.encode_string(method)
-        else:
-            message = "Bad HTTP method : " + method
-            raise ValueError(message)
+        uri = uri.encode()
+        method = method.upper().encode()
+        http_version = http_version.encode()
 
-        if (http_version == '1.0'
-                or http_version == '1.1'
-                or http_version == '2.0'):
-            http_version = utils.encode_string(http_version)
-        else:
-            message = "Bad HTTP version : " + http_version
-            raise ValueError(message)
-
-        uri = utils.encode_string(uri)
         retvalue = _lib.msc_process_uri(self._transaction_struct,
                                         uri,
                                         method,
@@ -122,8 +99,6 @@ class Transaction:
         if not retvalue:
             raise ProcessConnectionError.failed_at("request headers")
 
-        self.has_intervention(self._intervention)
-
     def add_request_header(self, key, value):
         """
         Adds a request header.
@@ -134,33 +109,12 @@ class Transaction:
         This function expects a NULL terminated string,
         for both: key and value.
         """
-        key = utils.encode_string(key)
-        value = utils.encode_string(value)
+        key = key.encode()
+        value = value.encode()
 
         retvalue = _lib.msc_add_request_header(self._transaction_struct,
                                                key,
                                                value)
-        if not retvalue:
-            raise FeedingError.failed_at("request header")
-
-    def add_n_request_header(self, key, value):
-        """
-        Adds a request header.
-
-        Same as msc_add_request_header, do not expect a NULL
-        terminated string, instead it expect the string and
-        the string size, for the value and key.
-        """
-        key_size = len(key)
-        value_size = len(value)
-        key = utils.encode_string(key)
-        value = utils.encode_string(value)
-
-        retvalue = _lib.msc_add_n_request_header(self._transaction_struct,
-                                                 key,
-                                                 key_size,
-                                                 value,
-                                                 value_size)
         if not retvalue:
             raise FeedingError.failed_at("request header")
 
@@ -175,34 +129,32 @@ class Transaction:
         1 - Adds the buffer in a row;
         2 - Adds it in chunks;
 
-        A third option should be developed which is
-        share your application buffer. In any case,
-        remember that the utilization of this function
-        may reduce your server throughput, as this buffer
-        creations is computationally expensive.
-
         While feeding ModSecurity remember to keep checking
         if there is an intervention, Sec Language has
         the capability to set the maximum inspection size
         which may be reached, and the decision on what to do
         in this case is upon the rules.
         """
-        size = len(body)
-        if size:
-            body = utils.encode_string(body)
-            retvalue = _lib.msc_append_request_body(self._transaction_struct,
-                                                    body,
-                                                    size)
-            if not retvalue:
-                raise FeedingError.failed_at("request body")
-        else:
-            raise EmptyBodyError
+        if not body:
+            return
+
+        body = body.encode()
+        retvalue = _lib.msc_append_request_body(self._transaction_struct,
+                                                body,
+                                                len(body))
+        if not retvalue:
+            raise FeedingError.failed_at("request body")
 
     def get_request_body_from_file(self, filepath):
+        """
+        """
+        # david : file not found est géré par libmodsecurity dans rules.py
+        # je ne comprends pas l'utilisation de _remote
+        # il est nécessaire d'expliciter dans la doc une exception standard ?
         if not os.path.isfile(filepath):
             raise FileNotFoundError
 
-        filepath = utils.encode_string(filepath)
+        filepath = filepath.encode()
 
         retvalue = _lib.msc_request_body_from_file(self._transaction_struct,
                                                    filepath)
@@ -227,8 +179,6 @@ class Transaction:
         if not retvalue:
             raise ProcessConnectionError.failed_at("request body")
 
-        self.has_intervention(self._intervention)
-
     def process_response_headers(self, statuscode, protocol):
         """
         Perform the analysis on the response headers.
@@ -239,15 +189,13 @@ class Transaction:
 
         Remember to check for a possible intervention.
         """
-        protocol = utils.encode_string(protocol)
+        protocol = protocol.encode()
 
         retvalue = _lib.msc_process_response_headers(self._transaction_struct,
                                                      statuscode,
                                                      protocol)
         if not retvalue:
             raise ProcessConnectionError.failed_at("response headers")
-
-        self.has_intervention(self._intervention)
 
     def add_response_header(self, key, value):
         """
@@ -259,33 +207,12 @@ class Transaction:
         This function expects a NULL terminated string,
         for both: key and value.
         """
-        key = utils.encode_string(key)
-        value = utils.encode_string(value)
+        key = key.encode()
+        value = value.encode()
 
         retvalue = _lib.msc_add_response_header(self._transaction_struct,
                                                 key,
                                                 value)
-        if not retvalue:
-            raise FeedingError.failed_at("response header")
-
-    def add_n_response_header(self, key, value):
-        """
-        Adds a response header
-
-        Same as add_response_header, but do not expect a
-        NULL terminated string, instead it expect the
-        string and the string size, for the value and key.
-        """
-        key_size = len(key)
-        value_size = len(value)
-        key = utils.encode_string(key)
-        value = utils.encode_string(value)
-
-        retvalue = _lib.msc_add_n_response_header(self._transaction_struct,
-                                                  key,
-                                                  key_size,
-                                                  value,
-                                                  value_size)
         if not retvalue:
             raise FeedingError.failed_at("response header")
 
@@ -307,8 +234,6 @@ class Transaction:
         if not retvalue:
             raise ProcessConnectionError.failed_at("response body")
 
-        self.has_intervention(self._intervention)
-
     def append_response_body(self, body):
         """
         Adds reponse body to be inspected.
@@ -323,14 +248,15 @@ class Transaction:
         the content length header filled, at least not with
         the old values. Otherwise unexpected behavior may happens.
         """
-        size = len(body)
-        if size:
-            body = utils.encode_string(body)
-            retvalue = _lib.msc_append_request_body(self._transaction_struct,
-                                                    body,
-                                                    size)
-            if not retvalue:
-                raise FeedingError.failed_at("response body")
+        if not body:
+            return
+
+        body = body.encode()
+        retvalue = _lib.msc_append_response_body(self._transaction_struct,
+                                                 body,
+                                                 len(body))
+        if not retvalue:
+            raise FeedingError.failed_at("response body")
 
     def get_response_body(self):
         """
@@ -341,7 +267,7 @@ class Transaction:
         body, otherwise there is no need to call this function.
         """
         retvalue = _lib.msc_get_response_body(self._transaction_struct)
-        if retvalue == NULL:
+        if retvalue == _NULL:
             raise BodyNotUpdated
 
     def get_response_body_length(self):
@@ -368,6 +294,10 @@ class Transaction:
 
         return True if a disrupive action has (to be) performed
         """
+        # martin [review]: je ferais une review quand ça existera, mais je 
+        # pense que tu peux envisager de faire un
+        # collections.namedtuple("Intervention") ou une classe Intervention.
+
         retvalue = _lib.msc_intervention(self._transaction_struct,
                                          intervention)
         # return retvalue
@@ -384,7 +314,7 @@ class Transaction:
 
     def process_logging(self):
         """
-        Logging all information relative to this transaction.
+        Log all information relative to this transaction.
 
         At this point there is not need to hold the connection,
         the response can be delivered prior to the execution
