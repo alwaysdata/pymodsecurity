@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-class Exception(Exception):
+class Error(Exception):
     """
     Base class for ModSecurity exception used by modsecurity,
     transaction and  rules modules.
@@ -15,20 +15,20 @@ class Exception(Exception):
         super().__init__(message, *pargs, **kargs)
 
 
-class InternalModsecurityError(Exception):
+class InternalError(Error):
     """
     Error raised when libmodsecurity has fed an error pointer.
     """
 
 
-class FileOpeningError(Exception):
+class FileOpeningError(Error):
     """
     Error raised when the C interface fails to open a file
     """
     default_message = "File cannot be opened by libmodsecurity"
 
 
-class RuleWritingError(Exception):
+class RuleWritingError(Error):
     """
     Error raised when the C interface fails to add rules
     to current rules instance
@@ -36,7 +36,7 @@ class RuleWritingError(Exception):
     default_message = "Rule(s) cannot be written"
 
 
-class ProcessConnectionError(Exception):
+class ProcessConnectionError(Error):
     """
     Error raised when the C interface fails to perfom
     the analysis on the connection.
@@ -56,14 +56,14 @@ class FeedingError(ProcessConnectionError):
     default_message = "Failed to feed modsecurity"
 
 
-class EmptyBodyError(Exception):
+class EmptyBodyError(Error):
     """
     Error raised when a HTTP body is empty.
     """
     default_message = "Body is empty"
 
 
-class BodyNotUpdated(Exception):
+class BodyNotUpdated(Error):
     """
     Error raised when the C interface returns 0 after
     checking if response body has been updated.
@@ -71,7 +71,7 @@ class BodyNotUpdated(Exception):
     default_message = "Body has not been updated"
 
 
-class LoggingActionError(Exception):
+class LoggingActionError(Error):
     """
     Error raised when the C interface fails to log
     all information realtive to a transaction.
