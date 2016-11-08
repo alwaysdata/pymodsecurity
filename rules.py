@@ -51,8 +51,9 @@ class Rules:
         Fetch rules over a network and merge it
         with the current rules set.
         """
-        key = utils.encode_string(key)
-        uri = utils.encode_string(uri)
+        key = key.encode()
+        uri = uri.encode()
+
         retvalue = _lib.msc_rules_add_remote(self._rules_set,
                                              key,
                                              uri,
@@ -62,7 +63,8 @@ class Rules:
             raise InternalError(message)
 
     def add_rules_file(self, filename):
-        filename = utils.encode_string(filename)
+        filename = filename.encode()
+
         retvalue = _lib.msc_rules_add_file(self._rules_set,
                                            filename,
                                            self._error_pointer)
@@ -75,7 +77,7 @@ class Rules:
         Add custom rule defined by `plain rules` and merge
         it with the current rules set.
         """
-        plain_rules = utils.encode_string(plain_rules)
+        plain_rules = plain_rules.encode()
         retvalue = _lib.msc_rules_add(self._rules_set,
                                       plain_rules,
                                       self._error_pointer)

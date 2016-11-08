@@ -3,7 +3,7 @@
 
 import functools
 
-import modsecurity.utils as utils
+from modsecurity import utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
 
@@ -76,7 +76,7 @@ class ModSecurity:
         in the following pattern :
             ConnectorName vX.Y.Z-tag (something else)
         """
-        _connector_info = utils.encode_string(connector)
+        _connector_info = connector.encode()
         return _lib.msc_set_connector_info(self._modsecurity_struct,
                                            _connector_info)
 
