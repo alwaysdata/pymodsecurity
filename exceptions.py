@@ -21,21 +21,6 @@ class InternalError(Error):
     """
 
 
-class FileOpeningError(Error):
-    """
-    Error raised when the C interface fails to open a file
-    """
-    default_message = "File cannot be opened by libmodsecurity"
-
-
-class RuleWritingError(Error):
-    """
-    Error raised when the C interface fails to add rules
-    to current rules instance
-    """
-    default_message = "Rule(s) cannot be written"
-
-
 class ProcessConnectionError(Error):
     """
     Error raised when the C interface fails to perfom
