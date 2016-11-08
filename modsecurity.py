@@ -16,12 +16,11 @@ class ModSecurity:
     """
     def __init__(self,):
         _modsecurity_struct = _lib.msc_init()
-        assert(_modsecurity_struct != NULL)
+        assert _modsecurity_struct != NULL
         self._modsecurity_struct = _ffi.gc(_modsecurity_struct,
                                            _lib.msc_cleanup)
 
-        self._connector_info = None
-        self._id = None
+        self._id = self.who_am_i()
         self._log_callback = NULL  # Has to be replaced by appropriate type, see set_log_callback()
         self.set_log_callback(self._modsecurity_struct, self.log_cb_test())  # DEBUG
 
@@ -64,7 +63,7 @@ class ModSecurity:
         break the existent parsers.
         (e.g. adding extra information _only_ to the end of the string)
         """
-        self._id = _lib.msc_who_am_i(self._modsecurity_struct)
+        return _lib.msc_who_am_i(self._modsecurity_struct)
 
     def set_connector_info(self, connector):
         """
@@ -77,9 +76,9 @@ class ModSecurity:
         in the following pattern :
             ConnectorName vX.Y.Z-tag (something else)
         """
-        self._connector_info = utils.encode_string(connector)
+        _connector_info = utils.encode_string(connector)
         return _lib.msc_set_connector_info(self._modsecurity_struct,
-                                           self._connector_info)
+                                           _connector_info)
 
 
 if __name__ == "__main__":
