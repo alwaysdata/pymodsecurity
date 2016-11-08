@@ -97,11 +97,6 @@ int msc_add_request_header(Transaction *transaction, const unsigned char *key,
     const unsigned char *value);
 
 /** @ingroup ModSecurity_C_API */
-int msc_add_n_request_header(Transaction *transaction,
-    const unsigned char *key, size_t len_key, const unsigned char *value,
-    size_t len_value);
-
-/** @ingroup ModSecurity_C_API */
 int msc_process_request_body(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
@@ -118,11 +113,6 @@ int msc_process_response_headers(Transaction *transaction, int code,
 /** @ingroup ModSecurity_C_API */
 int msc_add_response_header(Transaction *transaction,
     const unsigned char *key, const unsigned char *value);
-
-/** @ingroup ModSecurity_C_API */
-int msc_add_n_response_header(Transaction *transaction,
-    const unsigned char *key, size_t len_key, const unsigned char *value,
-    size_t len_value);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_response_body(Transaction *transaction);
