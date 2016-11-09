@@ -3,7 +3,7 @@
 modsecurity.transaction
 -----------------------
 
-Provide a class :class:`Transaction()` gathering methods coming from
+Provide a class :class:`Transaction` gathering methods coming from
 libmodsecurity C interface via CFFI engine.
 """
 
@@ -25,7 +25,7 @@ class Transaction:
     """
     Wrapper for C functions built from transaction.h via CFFI.
 
-    :param modsecurity: an instance of `~modsecurity.modsecurity.Modsecurity()`
+    :param modsecurity: an instance of `~modsecurity.modsecurity.ModSecurity()`
     :param rules: an instance of `~modsecurity.rules.Rules()`
     """
     def __init__(self, modsecurity, rules):
@@ -80,7 +80,7 @@ class Transaction:
         it is expected to be executed prior to the virtual host resolution,
         when the connection arrives on the server.
 
-        :param uri: uri address
+        :param uri: URI address
         :param method: an HTTP method
         :param http_version: a :class:`str` defining HTTP protocol version
 

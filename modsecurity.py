@@ -1,9 +1,15 @@
-#! python3
+#! python3  # DEBUG
 # coding: utf-8
+"""
+modsecurity.modsecurity
+-----------------------
+
+Provide a class :class:`ModSecurity` gathering methods coming from
+libmodsecurity C interface via CFFI engine.
+"""
 
 import functools
 
-from modsecurity import utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
 
@@ -34,11 +40,10 @@ class ModSecurity:
 
     def set_log_callback(self, callback, modsec):
         """
-        Set the log callback function
+        Set the log callback function.
 
-        It is neccessary to indicate to libModSecurity which
-        function within the connector should be called when
-        logging is required.
+        It is neccessary to indicate to libModSecurity whichc function within
+        the connector should be called when logging is required.
         """
         @functools.wraps(callback)
         def wrapper(self, modsec):  # an additionnal arg should probably go there
@@ -54,13 +59,12 @@ class ModSecurity:
         """
         Return information about this ModSecurity version and platform.
 
-        Platform and version are two questions that community will ask
-        prior to provide support. Making it available internally and
-        to the connector as well.
+        Platform and version are two questions that community will ask prior
+        to provide support. Making it available internally and to the
+        connector as well.
 
-        This information maybe will be used by a log parser.
-        If you want to update it, make it in a fashion that won't
-        break the existent parsers.
+        This information maybe will be used by a log parser. If you want to
+        update it, make it in a fashion that won't break the existent parsers.
         (e.g. adding extra information _only_ to the end of the string)
         """
         return _lib.msc_who_am_i(self._modsecurity_struct)
@@ -69,12 +73,14 @@ class ModSecurity:
         """
         Set information about the connector using the library.
 
-        For the purpose of log it is necessary for modsecurity
-        to understand which 'connector' is consuming the API.
+        For the purpose of log it is necessary for modsecurity to understand
+        which ``connector`` is consuming the API.
 
-        It is strongly recommended to set a information
-        in the following pattern :
+        It is strongly recommended to set a information in the following
+        pattern :
             ConnectorName vX.Y.Z-tag (something else)
+
+        :param connector: information about the connector as :class:`str`
         """
         _connector_info = connector.encode()
         return _lib.msc_set_connector_info(self._modsecurity_struct,
