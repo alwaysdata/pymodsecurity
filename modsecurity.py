@@ -66,6 +66,8 @@ class ModSecurity:
         This information maybe will be used by a log parser. If you want to
         update it, make it in a fashion that won't break the existent parsers.
         (e.g. adding extra information _only_ to the end of the string)
+
+        :return: ModSecurity version and platform.
         """
         return _lib.msc_who_am_i(self._modsecurity_struct)
 
@@ -82,9 +84,8 @@ class ModSecurity:
 
         :param connector: information about the connector as :class:`str`
         """
-        _connector_info = connector.encode()
         return _lib.msc_set_connector_info(self._modsecurity_struct,
-                                           _connector_info)
+                                           connector.encode())
 
 
 if __name__ == "__main__":

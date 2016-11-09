@@ -2,7 +2,7 @@
 # coding: utf-8
 """
 modsecurity.rules
------------------------
+-----------------
 
 Provide a class :class:`Rules` gathering methods coming from
 libmodsecurity C interface via CFFI engine.
@@ -67,12 +67,9 @@ class Rules:
         :param key: key as :class:`str`
         :param uri: URI address
         """
-        key = key.encode()
-        uri = uri.encode()
-
         retvalue = _lib.msc_rules_add_remote(self._rules_set,
-                                             key,
-                                             uri,
+                                             key.encode(),
+                                             uri.encode(),
                                              self._error_pointer)
         if retvalue == -1:
             message = self.get_error_message(self._error_pointer)
@@ -84,10 +81,8 @@ class Rules:
 
         :param filename: file path to rules file
         """
-        filename = filename.encode()
-
         retvalue = _lib.msc_rules_add_file(self._rules_set,
-                                           filename,
+                                           filename.encode(),
                                            self._error_pointer)
         if retvalue == -1:
             message = self.get_error_message(self._error_pointer)
@@ -100,9 +95,8 @@ class Rules:
 
         :param plain_rules: ModSecurity rules as :class:`str`
         """
-        plain_rules = plain_rules.encode()
         retvalue = _lib.msc_rules_add(self._rules_set,
-                                      plain_rules,
+                                      plain_rules.encode(),
                                       self._error_pointer)
         if retvalue == -1:
             message = self.get_error_message(self._error_pointer)

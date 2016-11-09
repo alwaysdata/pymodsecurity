@@ -53,21 +53,18 @@ class Transaction:
         it is expected to be executed prior to the virtual host resolution,
         when the connection arrives on the server.
 
-        :param client_ip: client's IP address in text format.
+        :param client_ip: client's IP address as :class:`str`
         :param client_port: client's port
-        :param server_ip: server's IP address in text format.
+        :param server_ip: server's IP address as :class:`str`
         :param server_port: server's port
 
-        Note: remember to check for a possible intervention
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
-        client_ip = client_ip.encode()
-        server_ip = server_ip.encode()
-
         retvalue = _lib.msc_process_connection(self._transaction_struct,
-                                               client_ip,
+                                               client_ip.encode(),
                                                client_port,
-                                               server_ip,
+                                               server_ip.encode(),
                                                server_port)
         if not retvalue:
             raise ProcessConnectionError.failed_at("connection")
@@ -84,19 +81,16 @@ class Transaction:
         :param method: an HTTP method
         :param http_version: a :class:`str` defining HTTP protocol version
 
-        Note: value consistency is not checked for ``method`` and
+        note:: value consistency is not checked for ``method`` and
         ``http_version``.
-        Note: remember to check for a possible intervention
+
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
-        uri = uri.encode()
-        method = method.upper().encode()
-        http_version = http_version.encode()
-
         retvalue = _lib.msc_process_uri(self._transaction_struct,
-                                        uri,
-                                        method,
-                                        http_version)
+                                        uri.encode(),
+                                        method.upper().encode(),
+                                        http_version.encode())
         if not retvalue:
             raise ProcessConnectionError.failed_at("uri")
 
@@ -108,7 +102,7 @@ class Transaction:
         however that the headers should be added prior to the execution of
         this function.
 
-        Note: remember to check for a possible intervention
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_request_headers(self._transaction_struct)
@@ -125,12 +119,9 @@ class Transaction:
         :param key: key of an request header
         :param value: value associated to ``key``
         """
-        key = key.encode()
-        value = value.encode()
-
         retvalue = _lib.msc_add_request_header(self._transaction_struct,
-                                               key,
-                                               value)
+                                               key.encode(),
+                                               value.encode())
         if not retvalue:
             raise FeedingError.failed_at("request header")
 
@@ -150,9 +141,8 @@ class Transaction:
         if not body:
             return
 
-        body = body.encode()
         retvalue = _lib.msc_append_request_body(self._transaction_struct,
-                                                body,
+                                                body.encode(),
                                                 len(body))
         if not retvalue:
             raise FeedingError.failed_at("request body")
@@ -169,10 +159,8 @@ class Transaction:
         if not os.path.isfile(filepath):
             raise FileNotFoundError
 
-        filepath = filepath.encode()
-
         retvalue = _lib.msc_request_body_from_file(self._transaction_struct,
-                                                   filepath)
+                                                   filepath.encode())
         if not retvalue:
             raise ProcessConnectionError.failed_at("getting request body from file")
 
@@ -187,7 +175,7 @@ class Transaction:
         It is necessary to append the request body prior to the execution of
         this function.
 
-        Note: remember to check for a possible intervention
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_request_body(self._transaction_struct)
@@ -205,14 +193,12 @@ class Transaction:
         :param statuscode: HTTP status code as :class:`int`
         :param protocol: protocol name with its version
 
-        Note: remember to check for a possible intervention
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
-        protocol = protocol.encode()
-
         retvalue = _lib.msc_process_response_headers(self._transaction_struct,
                                                      statuscode,
-                                                     protocol)
+                                                     protocol.encode())
         if not retvalue:
             raise ProcessConnectionError.failed_at("response headers")
 
@@ -226,12 +212,9 @@ class Transaction:
         :param key: key of an response header
         :param value: value associated to ``key``
         """
-        key = key.encode()
-        value = value.encode()
-
         retvalue = _lib.msc_add_response_header(self._transaction_struct,
-                                                key,
-                                                value)
+                                                key.encode(),
+                                                value.encode())
         if not retvalue:
             raise FeedingError.failed_at("response header")
 
@@ -246,7 +229,7 @@ class Transaction:
         It is necessary to append the response body prior to the execution of
         this function.
 
-        Note: remember to check for a possible intervention
+        note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_response_body(self._transaction_struct)
@@ -271,9 +254,8 @@ class Transaction:
         if not body:
             return
 
-        body = body.encode()
         retvalue = _lib.msc_append_response_body(self._transaction_struct,
-                                                 body,
+                                                 body.encode(),
                                                  len(body))
         if not retvalue:
             raise FeedingError.failed_at("response body")
@@ -297,7 +279,7 @@ class Transaction:
         This function returns the size of the update response body buffer,
         notice however, that most likely there isn't an update.
 
-        Return length of the response body if there's an update otherwise 0.
+        :return: length of the response body if there's an update
         """
         body_size = _lib.msc_get_response_body_length(self._transaction_struct)
         if not body_size:
@@ -312,7 +294,7 @@ class Transaction:
         Intervention can generate a log event and/or perform a disruptive
         action.
 
-        Return True if a disrupive action has (to be) performed
+        :return: ``True`` if a disrupive action has (to be) performed
         """
         # martin [review]: je ferais une review quand ça existera, mais je 
         # pense que tu peux envisager de faire un
