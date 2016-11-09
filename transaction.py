@@ -1,4 +1,11 @@
 # coding: utf-8
+"""
+modsecurity.transaction
+-----------------------
+
+Provide a class :class:`Transaction()` gathering methods coming from
+libmodsecurity C interface via CFFI engine.
+"""
 
 import os
 
@@ -16,7 +23,10 @@ _NULL = _ffi.NULL
 
 class Transaction:
     """
-    Wrapper for C function built from transaction.h via CFFI.
+    Wrapper for C functions built from transaction.h via CFFI.
+
+    :param modsecurity: an instance of `~modsecurity.modsecurity.Modsecurity()`
+    :param rules: an instance of `~modsecurity.rules.Rules()`
     """
     def __init__(self, modsecurity, rules):
         self._modsecurity = modsecurity
@@ -39,16 +49,17 @@ class Transaction:
         """
         Perform the analysis on the connection.
 
-        This function should be called at very beginning of a request
-        process, it is expected to be executed prior to the virtual
-        host resolution, when the connection arrives on the server.
+        This function should be called at very beginning of a request process,
+        it is expected to be executed prior to the virtual host resolution,
+        when the connection arrives on the server.
 
-        Remember to check for a possible intervention.
+        :param client_ip: client's IP address in text format.
+        :param client_port: client's port
+        :param server_ip: server's IP address in text format.
+        :param server_port: server's port
 
-        client_ip Client's IP address in text format.
-        client_port Client's port
-        server_ip Server's IP address in text format.
-        server_port Server's port
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         client_ip = client_ip.encode()
         server_ip = server_ip.encode()
@@ -63,16 +74,20 @@ class Transaction:
 
     def process_uri(self, uri, method, http_version):
         """
-        Perform the analysis on the URI and all the query
-        string variables.
+        Perform the analysis on the URI and all the query string variables.
 
-        This function should be called at very beginning
-        of a request process, it is expected to be executed
-        prior to the virtual host resolution, when the
-        connection arrives on the server.
+        This function should be called at very beginning of a request process,
+        it is expected to be executed prior to the virtual host resolution,
+        when the connection arrives on the server.
 
-        `http_version` must be '1.0' or '1.1' or '2.0' since
-        value consistency is not checked (same goes for `method`).
+        :param uri: uri address
+        :param method: an HTTP method
+        :param http_version: a :class:`str` defining HTTP protocol version
+
+        Note: value consistency is not checked for ``method`` and
+        ``http_version``.
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         uri = uri.encode()
         method = method.upper().encode()
@@ -87,13 +102,14 @@ class Transaction:
 
     def process_request_headers(self):
         """
-        Perform the analysis on the request readers.
+        Perform the analysis on the request headers.
 
-        This function perform the analysis on the request headers,
-        notice however that the headers should be added prior to
-        the execution of this function.
+        This function perform the analysis on the request headers, notice
+        however that the headers should be added prior to the execution of
+        this function.
 
-        Remember to check for a possible intervention.
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_request_headers(self._transaction_struct)
         if not retvalue:
@@ -101,13 +117,13 @@ class Transaction:
 
     def add_request_header(self, key, value):
         """
-        Adds a request header.
+        Add a request header.
 
-        With this function it is possible to feed ModSecurity
-        with a request header.
+        With this function it is possible to feed ModSecurity with a request
+        header.
 
-        This function expects a NULL terminated string,
-        for both: key and value.
+        :param key: key of an request header
+        :param value: value associated to ``key``
         """
         key = key.encode()
         value = value.encode()
@@ -120,20 +136,16 @@ class Transaction:
 
     def append_request_body(self, body):
         """
-        Adds request body to be inspected.
+        Add request body to be inspected.
 
-        With this function it is possible to feed
-        ModSecurity with data for inspection regarding
-        the request body. There are two possibilities here:
+        With this function it is possible to feed ModSecurity with data for
+        inspection regarding the request body.
+        There are two possibilities here:
 
-        1 - Adds the buffer in a row;
-        2 - Adds it in chunks;
+        1 - Adds the buffer in a row
+        2 - Adds it in chunks
 
-        While feeding ModSecurity remember to keep checking
-        if there is an intervention, Sec Language has
-        the capability to set the maximum inspection size
-        which may be reached, and the decision on what to do
-        in this case is upon the rules.
+        :param body: body of a request
         """
         if not body:
             return
@@ -147,6 +159,9 @@ class Transaction:
 
     def get_request_body_from_file(self, filepath):
         """
+        Add request body stored in a file to be inspected.
+
+        :param filepath: path to a file
         """
         # david : file not found est géré par libmodsecurity dans rules.py
         # je ne comprends pas l'utilisation de _remote
@@ -165,15 +180,15 @@ class Transaction:
         """
         Perform the analysis on the request body (if any)
 
-        This function perform the analysis on the request
-        body. It is optional to call that function.
-        If this API consumer already know that there isn't a
-        body for inspect it is recommended to skip this step.
+        This function perform the analysis on the request body. It is optional
+        to call that function. If this API consumer already know that there
+        isn't a body for inspect it is recommended to skip this step.
 
-        It is necessary to append the request body prior
-        to the execution of this function.
+        It is necessary to append the request body prior to the execution of
+        this function.
 
-        Remember to check for a possible intervention.
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_request_body(self._transaction_struct)
         if not retvalue:
@@ -183,11 +198,15 @@ class Transaction:
         """
         Perform the analysis on the response headers.
 
-        This function perform the analysis on the response
-        headers, notice however that the headers should be
-        added prior to the execution of this function.
+        This function perform the analysis on the response headers, notice
+        however that the headers should be added prior to the execution of
+        this function.
 
-        Remember to check for a possible intervention.
+        :param statuscode: HTTP status code as :class:`int`
+        :param protocol: protocol name with its version
+
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         protocol = protocol.encode()
 
@@ -199,13 +218,13 @@ class Transaction:
 
     def add_response_header(self, key, value):
         """
-        Adds a response header
+        Add a response header
 
-        With this function it is possible to feed
-        ModSecurity with a responseheader.
+        With this function it is possible to feed ModSecurity with a
+        response header.
 
-        This function expects a NULL terminated string,
-        for both: key and value.
+        :param key: key of an response header
+        :param value: value associated to ``key``
         """
         key = key.encode()
         value = value.encode()
@@ -220,15 +239,15 @@ class Transaction:
         """
         Perform the analysis on the response body (if any)
 
-        This function perform the analysis on the response body.
-        It is optional to call that function.
-        If this API consumer already know that there isn't
-        a body for inspect it is recommended to skip this step.
+        This function perform the analysis on the response body. It is optional
+        to call that function. If this API consumer already know that there
+        isn't a body for inspect it is recommended to skip this step.
 
-        It is necessary to append the response body prior
-        to the execution of this function.
+        It is necessary to append the response body prior to the execution of
+        this function.
 
-        Remember to check for a possible intervention.
+        Note: remember to check for a possible intervention
+            with :meth:`has_intervention()`.
         """
         retvalue = _lib.msc_process_response_body(self._transaction_struct)
         if not retvalue:
@@ -236,17 +255,18 @@ class Transaction:
 
     def append_response_body(self, body):
         """
-        Adds reponse body to be inspected.
+        Add reponse body to be inspected.
 
-        With this function it is possible to feed ModSecurity
-        with data for inspection regarding the response body.
-        ModSecurity can also update the contents of the
-        response body, this is not quite ready yet
-        on this version of the API.
+        With this function it is possible to feed ModSecurity with data for
+        inspection regarding the response body. ModSecurity can also update the
+        contents of the response body, this is not quite ready yet on this
+        version of the API.
 
-        If the content is updated, the client cannot receive
-        the content length header filled, at least not with
-        the old values. Otherwise unexpected behavior may happens.
+        If the content is updated, the client cannot receive the content length
+        header filled, at least not with the old values. Otherwise unexpected
+        behavior may happens.
+
+        :param body: body of a response
         """
         if not body:
             return
@@ -262,9 +282,9 @@ class Transaction:
         """
         Retrieve a buffer with the updated response body.
 
-        This function is needed to be called whenever
-        ModSecurity update the contents of the response
-        body, otherwise there is no need to call this function.
+        This function is needed to be called whenever ModSecurity update the
+        contents of the response body, otherwise there is no need to call this
+        function.
         """
         retvalue = _lib.msc_get_response_body(self._transaction_struct)
         if retvalue == _NULL:
@@ -274,10 +294,10 @@ class Transaction:
         """
         Retrieve the length of the updated response body.
 
-        This function returns the size of the update
-        response body buffer, notice however, that most
-        likely there isn't an update. Thus, this function
-        will return 0.
+        This function returns the size of the update response body buffer,
+        notice however, that most likely there isn't an update.
+
+        Return length of the response body if there's an update otherwise 0.
         """
         body_size = _lib.msc_get_response_body_length(self._transaction_struct)
         if not body_size:
@@ -289,10 +309,10 @@ class Transaction:
         """
         Check if ModSecurity has anything to ask to the server.
 
-        Intervention can generate a log event and/or perform
-        a disruptive action.
+        Intervention can generate a log event and/or perform a disruptive
+        action.
 
-        return True if a disrupive action has (to be) performed
+        Return True if a disrupive action has (to be) performed
         """
         # martin [review]: je ferais une review quand ça existera, mais je 
         # pense que tu peux envisager de faire un
@@ -316,9 +336,8 @@ class Transaction:
         """
         Log all information relative to this transaction.
 
-        At this point there is not need to hold the connection,
-        the response can be delivered prior to the execution
-        of this function.
+        At this point there is not need to hold the connection, the response
+        can be delivered prior to the execution of this function.
         """
         retvalue = _lib.msc_process_logging(self._transaction_struct)
         if not retvalue:
