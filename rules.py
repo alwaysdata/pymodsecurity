@@ -27,14 +27,14 @@ class Rules:
         _rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
 
         self._rules_set = _rules_set
-        self._error_pointer = _ffi.new('const char **', _NULL)
+        self._error_pointer = _ffi.new("const char **", _NULL)
 
     def get_error_message(self, error_pointer):
         """
         Retrieve error string pointed by error_pointer.
         This string is issued by libmodsecurity.
 
-        :param error_pointer: pointer to a char pointer
+        :param error_pointer: ``pointer`` to a ``char *``
         """
         error_message = utils.text(error_pointer[0])
         if not error_message:
@@ -53,9 +53,9 @@ class Rules:
         """
         Merging a rules set into another one.
 
-        Return the number of rules merged.
-
         :param other_rules: an instance of :class:`Rules`
+
+        :return: number of rules merged
         """
         return _lib.msc_rules_merge(self._rules_set,
                                     other_rules._rules_set)
@@ -101,25 +101,3 @@ class Rules:
         if retvalue == -1:
             message = self.get_error_message(self._error_pointer)
             raise InternalError(message)
-
-
-if __name__ == '__main__':
-    # Self-testing section
-    # Have to turn it into a unit test
-    filename = '/home/soonum/Code/alwaysdata/ModSecurity/examples/simple_example_using_c/basic_rules.conf'  # DEBUG
-    key = 'test'
-    uri = 'https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt'  # DEBUG
-
-    x = Rules()
-    y = Rules()
-
-    print('Adding rules file...', flush=True)
-    x.add_rules_file(filename)
-    print('Adding remote rules file...', flush=True)
-    y.add_remote_rules(key, uri)
-    print('Dumping rules...', flush=True)
-    x.dump_rules()
-    print('\nTrying to dump rules again # 1...', flush=True)
-    x.dump_rules()
-    print('\nAdding rules file with bad path...', flush=True)
-    x.add_rules_file('nofile')
