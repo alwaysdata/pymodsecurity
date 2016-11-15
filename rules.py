@@ -1,4 +1,3 @@
-#! python3  # DEBUG
 # coding: utf-8
 """
 modsecurity.rules
@@ -29,18 +28,18 @@ class Rules:
         self._rules_set = _rules_set
         self._error_pointer = _ffi.new("const char **", _NULL)
 
-    def get_error_message(self, error_pointer):
+    def _last_error_message(self):
         """
         Retrieve error string pointed by error_pointer.
         This string is issued by libmodsecurity.
 
         :param error_pointer: ``pointer`` to a ``char *``
         """
-        error_message = utils.text(error_pointer[0])
+        error_message = utils.text(self._error_pointer[0])
         if not error_message:
             error_message = "No information provided by libmodsecurity"
+        self._error_pointer[0] = _NULL
 
-        error_pointer[0] = _NULL
         return error_message
 
     def dump_rules(self):
@@ -72,7 +71,7 @@ class Rules:
                                              uri.encode(),
                                              self._error_pointer)
         if retvalue == -1:
-            message = self.get_error_message(self._error_pointer)
+            message = self._last_error_message()
             raise InternalError(message)
 
     def add_rules_file(self, filename):
@@ -85,7 +84,7 @@ class Rules:
                                            filename.encode(),
                                            self._error_pointer)
         if retvalue == -1:
-            message = self.get_error_message(self._error_pointer)
+            message = self._last_error_message()
             raise InternalError(message)
 
     def add_rules(self, plain_rules):
@@ -99,5 +98,5 @@ class Rules:
                                       plain_rules.encode(),
                                       self._error_pointer)
         if retvalue == -1:
-            message = self.get_error_message(self._error_pointer)
+            message = self._last_error_message()
             raise InternalError(message)
