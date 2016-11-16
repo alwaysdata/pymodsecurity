@@ -59,7 +59,7 @@ class Rules:
         return _lib.msc_rules_merge(self._rules_set,
                                     other_rules._rules_set)
 
-    def add_remote_rules(self, key, uri):
+    def add_rules_remote(self, key, uri):
         """
         Fetch rules over a network and merge it with the current rules set.
 
@@ -71,8 +71,8 @@ class Rules:
                                              uri.encode(),
                                              self._error_pointer)
         if retvalue == -1:
-            message = self._last_error_message()
-            raise InternalError(message)
+            raise InternalError(self._last_error_message())
+        return retvalue
 
     def add_rules_file(self, filename):
         """
@@ -84,8 +84,8 @@ class Rules:
                                            filename.encode(),
                                            self._error_pointer)
         if retvalue == -1:
-            message = self._last_error_message()
-            raise InternalError(message)
+            raise InternalError(self._last_error_message())
+        return retvalue
 
     def add_rules(self, plain_rules):
         """
@@ -98,5 +98,5 @@ class Rules:
                                       plain_rules.encode(),
                                       self._error_pointer)
         if retvalue == -1:
-            message = self._last_error_message()
-            raise InternalError(message)
+            raise InternalError(self._last_error_message())
+        return retvalue
