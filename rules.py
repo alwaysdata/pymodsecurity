@@ -23,9 +23,8 @@ class Rules:
     def __init__(self,):
         _rules_set = _lib.msc_create_rules_set()
         assert _rules_set != _NULL
-        _rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
+        self._rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
 
-        self._rules_set = _rules_set
         self._error_pointer = _ffi.new("const char **", _NULL)
 
     def _last_error_message(self):
