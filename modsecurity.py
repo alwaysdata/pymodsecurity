@@ -28,7 +28,7 @@ class ModSecurity:
 
         self._id = self.who_am_i()
         self._log_callback = NULL  # Has to be replaced by appropriate type, see set_log_callback()
-        self.set_log_callback(self._modsecurity_struct, self.log_cb_test())  # DEBUG
+        #self.set_log_callback(self._modsecurity_struct, self.log_cb_test())  # DEBUG
 
     def log_cb_test(self, *pargs):  # DEBUG
         """
@@ -38,7 +38,7 @@ class ModSecurity:
         """
         pass
 
-    def set_log_callback(self, callback, modsec):
+    def set_log_callback(self, modsec, callback):
         """
         Set the log callback function.
 
