@@ -31,18 +31,26 @@ class Transaction:
     def __init__(self, modsecurity, rules):
         self._modsecurity = modsecurity
         self._rules = rules
-        self._log_callback = _NULL  # _log_callback has to be properly defined if needed (maybe fetch it from modsecurity.py ?)
-        _charp1 = _ffi.new("char *")
-        _charp2 = _ffi.new("char *")
+        self._log_callback_data = _NULL  # _log_callback_data has to be properly defined if needed
+        self._charp1 = _ffi.new("char *")
+        self._charp2 = _ffi.new("char *")
         self._intervention = _ffi.new("ModSecurityIntervention *",
-                                      [0, 0, _charp1, _charp2, 0])
+                                      [0, 0, self._charp1, self._charp2, 0])
 
-        _transaction_struct = _lib.msc_new_transaction(self._modsecurity._modsecurity_struct,
-                                                       self._rules._rules_set,
-                                                       self._log_callback)
-        assert _transaction_struct != _NULL
-        self._transaction_struct = _ffi.gc(_transaction_struct,
-                                           _lib.msc_transaction_cleanup)
+        self._transaction_struct = _lib.msc_new_transaction(
+            self._modsecurity._modsecurity_struct,
+            self._rules._rules_set,
+            self._log_callback_data)
+        assert self._transaction_struct != _NULL
+
+    def __del__(self):
+        """
+        :func:`msc_transaction_cleanup` MUST be called before
+        :class:`~modsecurity.ModSecurity` and :class:`~modsecurity.Rules`
+        objects are garbage collected.
+        Otherwise it will end-up in a segmentation fault.
+        """
+        self._transaction_struct = _lib.msc_transaction_cleanup
 
     def process_connection(self, client_ip, client_port,
                            server_ip, server_port):
