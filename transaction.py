@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 """
 modsecurity.transaction
 -----------------------
@@ -9,7 +9,6 @@ libmodsecurity C interface via CFFI engine.
 
 import os
 
-from modsecurity import utils
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
 from modsecurity.exceptions import (ProcessConnectionError,
@@ -146,9 +145,6 @@ class Transaction:
 
         :param body: body of a request
         """
-        if not body:
-            return
-
         retvalue = _lib.msc_append_request_body(self._transaction_struct,
                                                 body.encode(),
                                                 len(body))
@@ -276,9 +272,11 @@ class Transaction:
         contents of the response body, otherwise there is no need to call this
         function.
         """
-        retvalue = _lib.msc_get_response_body(self._transaction_struct)
-        if retvalue == _NULL:
+        return_buffer = _lib.msc_get_response_body(self._transaction_struct)
+        if return_buffer == _NULL:
             raise BodyNotUpdated
+
+        return return_buffer
 
     def get_response_body_length(self):
         """
@@ -295,7 +293,7 @@ class Transaction:
 
         return body_size
 
-    def has_intervention(self, intervention):
+    def has_intervention(self):
         """
         Check if ModSecurity has anything to ask to the server.
 
@@ -303,24 +301,12 @@ class Transaction:
         action.
 
         :return: ``True`` if a disrupive action has (to be) performed
+
+        :note: a disruptive action HAS performed only if conf file
+            ``SecRuleEngine`` is set to ``on``.
         """
-        # martin [review]: je ferais une review quand ça existera, mais je 
-        # pense que tu peux envisager de faire un
-        # collections.namedtuple("Intervention") ou une classe Intervention.
-
-        retvalue = _lib.msc_intervention(self._transaction_struct,
-                                         intervention)
-        # return retvalue
-        if retvalue:
-            # Have to find a better way to display intervention attributes
-            # It would probably depend on the architecture of almodsecurity
-            print("!INTERVENTION! Something should be done")  # DEBUG
-
-        print("status =", intervention.status)  # DEBUG
-        print("pause =", intervention.pause)  # DEBUG
-        print("url =", utils.text(intervention.url))  # DEBUG
-        print("log =", utils.text(intervention.log))  # DEBUG
-        print("disruptive =", intervention.disruptive)  # DEBUG
+        return bool(_lib.msc_intervention(self._transaction_struct,
+                                          self._intervention))
 
     def process_logging(self):
         """
