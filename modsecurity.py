@@ -1,5 +1,4 @@
-#! python3  # DEBUG
-# coding: utf-8
+# -*- coding: utf-8 -*-
 """
 modsecurity.modsecurity
 -----------------------
@@ -12,6 +11,7 @@ import functools
 
 from modsecurity._modsecurity import ffi as _ffi
 from modsecurity._modsecurity import lib as _lib
+from modsecurity import utils
 
 NULL = _ffi.NULL
 
@@ -69,7 +69,9 @@ class ModSecurity:
 
         :return: ModSecurity version and platform.
         """
-        return _lib.msc_who_am_i(self._modsecurity_struct)
+        retvalue = _lib.msc_who_am_i(self._modsecurity_struct)
+
+        return utils.text(retvalue)
 
     def set_connector_info(self, connector):
         """
@@ -86,15 +88,3 @@ class ModSecurity:
         """
         return _lib.msc_set_connector_info(self._modsecurity_struct,
                                            connector.encode())
-
-
-if __name__ == "__main__":
-    # Self-testing section
-    x = ModSecurity()
-
-    x.who_am_i()
-    print("who_am_i result =", _ffi.string(x._id))
-    x.set_connector_info("TestConnector v0.0.0-test (spam)")
-    print("Test connector info =", x._connector_info)
-    print("Testing set_log_callback()")
-    x.set_log_callback()
