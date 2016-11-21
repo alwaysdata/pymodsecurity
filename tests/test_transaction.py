@@ -41,7 +41,7 @@ class TestTransaction(unittest.TestCase):
             mock = unittest.mock.Mock(return_value=return_value)
             return mock()
 
-        with self.assertRaises(expected_exception) as ctx:
+        with self.assertRaises(expected_exception):
             with unittest.mock.patch("modsecurity.transaction._lib") as ffi_mock:
                 getattr(ffi_mock, msc_function).side_effect = _create_mock
                 yield
