@@ -10,7 +10,7 @@ path = "../.."  # NOQA
 if path not in sys.path:  # NOQA
     sys.path.insert(0, path)  # NOQA
 
-from modsecurity import modsecurity
+from pymodsecurity import modsecurity
 
 
 class TestModsecurity(unittest.TestCase):

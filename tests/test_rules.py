@@ -13,9 +13,9 @@ path = "../.."  # NOQA
 if path not in sys.path:  # NOQA
     sys.path.insert(0, path)  # NOQA
 
-from modsecurity import rules
-from modsecurity._modsecurity import ffi
-from modsecurity.exceptions import InternalError
+from pymodsecurity import rules
+from pymodsecurity._modsecurity import ffi
+from pymodsecurity.exceptions import InternalError
 
 
 class TestRules(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestRules(unittest.TestCase):
             return -1
 
         with self.assertRaises(InternalError) as ctx:
-            with unittest.mock.patch("modsecurity.rules._lib") as ffi_mock:
+            with unittest.mock.patch("pymodsecurity.rules._lib") as ffi_mock:
                 getattr(ffi_mock, msc_function).side_effect = _side_effect
                 yield
         self.assertEqual("error message", ctx.exception.args[0])
@@ -41,9 +41,9 @@ class TestRules(unittest.TestCase):
     def test__last_error_message(self):
         """
         Test private method :func:`_last_error_message` which is only used
-        inside :func:`~modsecurity.rules.Rules.add_rules_remote`,
-        :func:`~modsecurity.rules.Rules.add_rules_file`, and
-        :func:`~modsecurity.rules.Rules.add_rules`.
+        inside :func:`~pymodsecurity.rules.Rules.add_rules_remote`,
+        :func:`~pymodsecurity.rules.Rules.add_rules_file`, and
+        :func:`~pymodsecurity.rules.Rules.add_rules`.
 
         Since this function uses private attribute ``_error_pointer`` and
         perfom operations on it, it is necessary to expose and maniuplate here.
@@ -55,7 +55,6 @@ class TestRules(unittest.TestCase):
         # After call test
         self.assertEqual(self.rules_set._error_pointer[0], ffi.NULL)
 
-    #@unittest.skip("For DEBUG purpose")  # DEBUG
     def test_add_rules_remote(self):
         # Good use
         key = "test_key"

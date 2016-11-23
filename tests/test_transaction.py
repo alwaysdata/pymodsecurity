@@ -13,14 +13,14 @@ path = "../.."  # NOQA
 if path not in sys.path:  # NOQA
     sys.path.insert(0, path)  # NOQA
 
-from modsecurity import transaction
-from modsecurity.modsecurity import ModSecurity
-from modsecurity.rules import Rules
-from modsecurity._modsecurity import ffi
-from modsecurity.exceptions import (ProcessConnectionError,
-                                    FeedingError,
-                                    BodyNotUpdated,
-                                    LoggingActionError)
+from pymodsecurity import transaction
+from pymodsecurity.modsecurity import ModSecurity
+from pymodsecurity.rules import Rules
+from pymodsecurity._modsecurity import ffi
+from pymodsecurity.exceptions import (ProcessConnectionError,
+                                      FeedingError,
+                                      BodyNotUpdated,
+                                      LoggingActionError)
 
 
 class TestTransaction(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestTransaction(unittest.TestCase):
             return mock()
 
         with self.assertRaises(expected_exception):
-            with unittest.mock.patch("modsecurity.transaction._lib") as ffi_mock:
+            with unittest.mock.patch("pymodsecurity.transaction._lib") as ffi_mock:
                 getattr(ffi_mock, msc_function).side_effect = _create_mock
                 yield
 
