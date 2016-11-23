@@ -3,8 +3,8 @@
 
 class Error(Exception):
     """
-    Base class for ModSecurity exception used by modsecurity,
-    transaction and  rules modules.
+    Base class for ModSecurity exception used by ``modsecurity``,
+    ``transaction`` and ``rules`` modules.
     """
     default_message = None
 
@@ -36,9 +36,9 @@ class ProcessConnectionError(Error):
 class FeedingError(ProcessConnectionError):
     """
     Error raised when the C interface fails to feed
-    modsecurity with datas (e.g. request headers)
+    ModSecurity with datas (e.g. request headers)
     """
-    default_message = "Failed to feed modsecurity"
+    default_message = "Failed to feed ModSecurity"
 
 
 class EmptyBodyError(Error):
