@@ -37,7 +37,7 @@ typedef struct ModSecurity_t ModSecurity;
 typedef void (*LogCb) (void *, const char *);
 
 /** @ingroup ModSecurity_C_API */
-ModSecurity *msc_init();
+ModSecurity *msc_init(void);
 /** @ingroup ModSecurity_C_API */
 const char *msc_who_am_i(ModSecurity *msc);
 /** @ingroup ModSecurity_C_API */
@@ -153,7 +153,7 @@ int msc_process_logging(Transaction *transaction);
 
 typedef struct Rules_t Rules;
 
-Rules *msc_create_rules_set();
+Rules *msc_create_rules_set(void);
 void msc_rules_dump(Rules *rules);
 int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
 int msc_rules_add_remote(Rules *rules, const char *key, const char *uri,
