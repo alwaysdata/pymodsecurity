@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-modsecurity.modsecurity
+pymodsecurity.modsecurity
 -----------------------
 
 Provide a class :class:`ModSecurity` gathering methods coming from
@@ -9,9 +9,9 @@ libmodsecurity C interface via CFFI engine.
 
 import functools
 
-from modsecurity._modsecurity import ffi as _ffi
-from modsecurity._modsecurity import lib as _lib
-from modsecurity import utils
+from pymodsecurity._modsecurity import ffi as _ffi
+from pymodsecurity._modsecurity import lib as _lib
+from pymodsecurity import utils
 
 NULL = _ffi.NULL
 
@@ -27,28 +27,21 @@ class ModSecurity:
                                            _lib.msc_cleanup)
 
         self._id = self.who_am_i()
-        self._log_callback = NULL  # Has to be replaced by appropriate type, see set_log_callback()
-        #self.set_log_callback(self._modsecurity_struct, self.log_cb_test())  # DEBUG
-
-    def log_cb_test(self, *pargs):  # DEBUG
-        """
-        Test log callback function. This function has to be passed
-        as input of set_log_callback in ordrer to be interfaced
-        with libmodsecurity
-        """
-        pass
+        self._log_callback = NULL
 
     def set_log_callback(self, modsec, callback):
         """
         Set the log callback function.
 
-        It is neccessary to indicate to libModSecurity whichc function within
+        It is neccessary to indicate to libModSecurity which function within
         the connector should be called when logging is required.
+
+        :note: This method is not usable yet.
         """
         @functools.wraps(callback)
-        def wrapper(self, modsec):  # an additionnal arg should probably go there
+        def wrapper(self, modsec):
             callback()
-            return  # something?
+            return
 
         self._log_callback = _ffi.callback("void (*)(void *, const char *)",
                                            wrapper)
@@ -70,14 +63,13 @@ class ModSecurity:
         :return: ModSecurity version and platform.
         """
         retvalue = _lib.msc_who_am_i(self._modsecurity_struct)
-
         return utils.text(retvalue)
 
     def set_connector_info(self, connector):
         """
         Set information about the connector using the library.
 
-        For the purpose of log it is necessary for modsecurity to understand
+        For the purpose of log it is necessary for ModSecurity to understand
         which ``connector`` is consuming the API.
 
         It is strongly recommended to set a information in the following
