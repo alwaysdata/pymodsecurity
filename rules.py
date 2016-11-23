@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-modsecurity.rules
+pymodsecurity.rules
 -----------------
 
 Provide a class :class:`Rules` gathering methods coming from
 libmodsecurity C interface via CFFI engine.
 """
 
-from modsecurity import utils
-from modsecurity._modsecurity import ffi as _ffi
-from modsecurity._modsecurity import lib as _lib
-from modsecurity.exceptions import InternalError
+from pymodsecurity import utils
+from pymodsecurity._modsecurity import ffi as _ffi
+from pymodsecurity._modsecurity import lib as _lib
+from pymodsecurity.exceptions import InternalError
 
 
 _NULL = _ffi.NULL
@@ -31,8 +31,6 @@ class Rules:
         """
         Retrieve error string pointed by error_pointer.
         This string is issued by libmodsecurity.
-
-        :param error_pointer: ``pointer`` to a ``char *``
         """
         error_message = utils.text(self._error_pointer[0])
         if not error_message:
@@ -49,7 +47,7 @@ class Rules:
 
     def merge_rules(self, other_rules):
         """
-        Merging a rules set into another one.
+        Merge a rules set into another one.
 
         :param other_rules: an instance of :class:`Rules`
 
@@ -64,6 +62,8 @@ class Rules:
 
         :param key: key as :class:`str`
         :param uri: URI address
+
+        :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add_remote(self._rules_set,
                                              key.encode(),
@@ -75,9 +75,11 @@ class Rules:
 
     def add_rules_file(self, filename):
         """
-        Add rules stored in a file.
+        Add rules stored in a file and merge it with the current rules set.
 
         :param filename: file path to rules file
+
+        :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add_file(self._rules_set,
                                            filename.encode(),
@@ -92,6 +94,8 @@ class Rules:
         rules set.
 
         :param plain_rules: ModSecurity rules as :class:`str`
+
+        :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add(self._rules_set,
                                       plain_rules.encode(),
