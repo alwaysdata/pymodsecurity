@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-modsecurity.transaction
+pymodsecurity.transaction
 -----------------------
 
 Provide a class :class:`Transaction` gathering methods coming from
@@ -9,9 +9,9 @@ libmodsecurity C interface via CFFI engine.
 
 import os
 
-from modsecurity._modsecurity import ffi as _ffi
-from modsecurity._modsecurity import lib as _lib
-from modsecurity.exceptions import (ProcessConnectionError,
+from pymodsecurity._modsecurity import ffi as _ffi
+from pymodsecurity._modsecurity import lib as _lib
+from pymodsecurity.exceptions import (ProcessConnectionError,
                                     FeedingError,
                                     BodyNotUpdated,
                                     LoggingActionError)
@@ -24,13 +24,13 @@ class Transaction:
     """
     Wrapper for C functions built from transaction.h via CFFI.
 
-    :param modsecurity: an instance of `~modsecurity.modsecurity.ModSecurity()`
-    :param rules: an instance of `~modsecurity.rules.Rules()`
+    :param modsecurity: an instance of :class:`~pymodsecurity.modsecurity.ModSecurity`
+    :param rules: an instance of :class:`~pymodsecurity.rules.Rules`
     """
     def __init__(self, modsecurity, rules):
         self._modsecurity = modsecurity
         self._rules = rules
-        self._log_callback_data = _NULL  # _log_callback_data has to be properly defined if needed
+        self._log_callback_data = _NULL
         self._charp1 = _ffi.new("char *")
         self._charp2 = _ffi.new("char *")
         self._intervention = _ffi.new("ModSecurityIntervention *",
@@ -45,13 +45,15 @@ class Transaction:
     def __del__(self):
         """
         :func:`msc_transaction_cleanup` MUST be called before
-        :class:`~modsecurity.ModSecurity` and :class:`~modsecurity.Rules`
+        :class:`~pymodsecurity.modsecurity.ModSecurity` and 
+        :class:`~pymodsecurity.modsecurity.Rules`
         objects are garbage collected.
         Otherwise it will end-up in a segmentation fault.
         """
         self._transaction_struct = _lib.msc_transaction_cleanup
 
-    def process_connection(self, client_ip, client_port,
+    def process_connection(self,
+                           client_ip, client_port,
                            server_ip, server_port):
         """
         Perform the analysis on the connection.
@@ -61,9 +63,9 @@ class Transaction:
         when the connection arrives on the server.
 
         :param client_ip: client's IP address as :class:`str`
-        :param client_port: client's port
+        :param client_port: client's port as :class:`int`
         :param server_ip: server's IP address as :class:`str`
-        :param server_port: server's port
+        :param server_port: server's port as :class:`int`
 
         note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
@@ -123,7 +125,7 @@ class Transaction:
         With this function it is possible to feed ModSecurity with a request
         header.
 
-        :param key: key of an request header
+        :param key: key of a request header
         :param value: value associated to ``key``
         """
         retvalue = _lib.msc_add_request_header(self._transaction_struct,
@@ -140,8 +142,8 @@ class Transaction:
         inspection regarding the request body.
         There are two possibilities here:
 
-        1 - Adds the buffer in a row
-        2 - Adds it in chunks
+            1 - Adds the buffer in a row
+            2 - Adds it in chunks
 
         :param body: body of a request
         """
@@ -157,16 +159,10 @@ class Transaction:
 
         :param filepath: path to a file
         """
-        # david : file not found est géré par libmodsecurity dans rules.py
-        # je ne comprends pas l'utilisation de _remote
-        # il est nécessaire d'expliciter dans la doc une exception standard ?
-        if not os.path.isfile(filepath):
-            raise FileNotFoundError
-
         retvalue = _lib.msc_request_body_from_file(self._transaction_struct,
                                                    filepath.encode())
         if not retvalue:
-            raise ProcessConnectionError.failed_at("getting request body from file")
+            raise FeedingError.failed_at("getting request body from file")
 
     def process_request_body(self):
         """
@@ -195,7 +191,7 @@ class Transaction:
         this function.
 
         :param statuscode: HTTP status code as :class:`int`
-        :param protocol: protocol name with its version
+        :param protocol: protocol name with its version (e.g "HTTP 1.1")
 
         note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
@@ -271,12 +267,14 @@ class Transaction:
         This function is needed to be called whenever ModSecurity update the
         contents of the response body, otherwise there is no need to call this
         function.
+
+        :return: buffer containing the response body
         """
-        return_buffer = _lib.msc_get_response_body(self._transaction_struct)
-        if return_buffer == _NULL:
+        returned_buffer = _lib.msc_get_response_body(self._transaction_struct)
+        if returned_buffer == _NULL:
             raise BodyNotUpdated
 
-        return return_buffer
+        return returned_buffer
 
     def get_response_body_length(self):
         """
