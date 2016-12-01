@@ -5,13 +5,8 @@ Test Rules methods.
 
 import contextlib
 import os
-import sys
 import unittest
 import unittest.mock
-
-path = "../.."  # NOQA
-if path not in sys.path:  # NOQA
-    sys.path.insert(0, path)  # NOQA
 
 from pymodsecurity import rules
 from pymodsecurity._modsecurity import ffi

@@ -3,12 +3,7 @@
 Test Transaction methods.
 """
 
-import sys
 import unittest
-
-path = "../.."  # NOQA
-if path not in sys.path:  # NOQA
-    sys.path.insert(0, path)  # NOQA
 
 from pymodsecurity import modsecurity
 

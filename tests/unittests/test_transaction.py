@@ -5,21 +5,14 @@ Test Transaction methods.
 
 import contextlib
 import os
-import sys
 import unittest
 import unittest.mock
-
-path = "../.."  # NOQA
-if path not in sys.path:  # NOQA
-    sys.path.insert(0, path)  # NOQA
 
 from pymodsecurity import transaction
 from pymodsecurity.modsecurity import ModSecurity
 from pymodsecurity.rules import Rules
-from pymodsecurity._modsecurity import ffi
 from pymodsecurity.exceptions import (ProcessConnectionError,
                                       FeedingError,
-                                      BodyNotUpdated,
                                       LoggingActionError)
 
 
@@ -139,21 +132,18 @@ class TestTransaction(unittest.TestCase):
             self.transactions.append_response_body(self.body)
 
     def test_get_response_body(self):
-        # Regular use of get_response_body() cannot be tested in unit test
-        # since libmodsecurity has to update the body to return a buffer.
+        # Regular use of get_response_body_length() cannot be tested in unit
+        # test since libmodsecurity has to update the body to return its length.
 
-        with self.assert_error_message_raised("msc_get_response_body",
-                                              BodyNotUpdated,
-                                              return_value=ffi.NULL):
-            self.transactions.get_response_body()
+        # Body not updated
+        self.assertEqual(self.transactions.get_response_body(), b"")
 
     def test_get_response_body_length(self):
         # Regular use of get_response_body_length() cannot be tested in unit
         # test since libmodsecurity has to update the body to return its length.
 
-        with self.assert_error_message_raised("msc_get_response_body_length",
-                                              BodyNotUpdated):
-            self.transactions.get_response_body_length()
+        # Body not updated
+        self.assertEqual(self.transactions.get_response_body_length(), 0)
 
     def test_process_response_headers(self):
         self.transactions.add_response_header("Accept-Ranges", "bytes")
