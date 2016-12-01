@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 pymodsecurity.rules
------------------
+-------------------
 
 Provide a class :class:`Rules` gathering methods coming from
-libmodsecurity C interface via CFFI engine.
+libmodsecurity.
 """
 
 from pymodsecurity import utils
@@ -18,7 +18,7 @@ _NULL = _ffi.NULL
 
 class Rules:
     """
-    Wrapper for C function built from rules.h via CFFI.
+    Wrapper for C function built from **rules.h** via CFFI.
     """
     def __init__(self,):
         _rules_set = _lib.msc_create_rules_set()
@@ -90,10 +90,10 @@ class Rules:
 
     def add_rules(self, plain_rules):
         """
-        Add custom rule defined by `plain rules` and merge it with the current
-        rules set.
+        Add custom rule defined by ``plain rules`` and merge it with the
+        current rules set.
 
-        :param plain_rules: ModSecurity rules as :class:`str`
+        :param plain_rules: ModSecurity rule(s) as :class:`str`
 
         :return: number of rules merged as :class:`int`
         """

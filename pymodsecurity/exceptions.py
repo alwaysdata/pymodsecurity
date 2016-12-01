@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+pymodsecurity.exceptions
+-------------------------
+"""
 
 
 class Error(Exception):
@@ -48,17 +52,9 @@ class EmptyBodyError(Error):
     default_message = "Body is empty"
 
 
-class BodyNotUpdated(Error):
-    """
-    Error raised when the C interface returns 0 after
-    checking if response body has been updated.
-    """
-    default_message = "Body has not been updated"
-
-
 class LoggingActionError(Error):
     """
     Error raised when the C interface fails to log
     all information realtive to a transaction.
     """
-    default_message = "Fail to log information about the transaction"
+    default_message = "Failed to log information about the transaction"
