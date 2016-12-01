@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from pymodsecurity._modsecurity import ffi as _ffi
+
+_encoding = sys.getdefaultencoding()
+
+
+def as_bytes(arg, encoding=_encoding):
+    return bytes(arg, encoding)
 
 
 def text(charp):
