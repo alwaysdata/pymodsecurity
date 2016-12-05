@@ -16,16 +16,8 @@ modsec_lib_name = "_modsecurity"
 
 ffibuilder = cffi.FFI()
 
-try:
-    with open(path_to_source, 'r') as f:
-        ffibuilder.set_source(modsec_lib_name,
-                              f.read(),
-                              libraries=libraries,)
-except FileNotFoundError:
-    raise
+with open(path_to_source, 'r') as f:
+    ffibuilder.set_source(modsec_lib_name, f.read(), libraries=libraries,)
 
-try:
-    with open(path_to_cdef, 'r') as f:
-        ffibuilder.cdef(f.read())
-except FileNotFoundError:
-    raise
+with open(path_to_cdef, 'r') as f:
+    ffibuilder.cdef(f.read())
