@@ -12,7 +12,6 @@ setup_parameters = dict(
     name=version.__title__,
     version=version.__version__,
     description=version.__summary__,
-    long_description=None,  # HAS TO BE COMPLETED
     author=version.__author__,
     author_email=version.__email__,
     url=version.__uri__,
@@ -33,10 +32,8 @@ setup_parameters = dict(
     packages=["pymodsecurity"],
 
     setup_requires=["cffi>=1.8.0"],
-    install_requires=[
-        "cffi>=1.8.0",
-        "sphinx_rtd_theme"
-    ],
+    install_requires=["cffi>=1.8.0",
+                      "sphinx_rtd_theme"],
     cffi_modules=["pymodsecurity/build_pymodsecurity.py:ffibuilder"],
     ext_package="pymodsecurity",
 )

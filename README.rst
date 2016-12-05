@@ -1,22 +1,25 @@
-Installation
+Instructions
 ============
 
-pymodsecurity requires Python 3.3.6 or greater and the following packages:
+Installation
+------------
+
+pymodsecurity requires Python 3.3 or greater and the following packages:
 
   - cffi
   - setuptools
   - libmodsecurity
 
-Note : 
+Note :
   - make sure that libmodsecurity version is 3.0.0 or greater.
   - all libmodsecurity.so files must be visible in standard library path,
     it can be done by using symlinks like so:
 
 .. code-block:: bash
 
-       $ sudo ln -s /current/path/to/libmodsecurity.so /standard/path/to/lib/libmodsecurity.so 
+       $ sudo ln -s /current/path/to/libmodsecurity.so /standard/path/to/lib/libmodsecurity.so
 
-pymodsecurity uses setuptools, so you can install it using :    
+pymodsecurity uses setuptools, so you can install it using :
 
 .. code-block:: bash
 
@@ -24,7 +27,7 @@ pymodsecurity uses setuptools, so you can install it using :
 	$ sudo python3 setup.py install
 
 Documentation
-=============
+-------------
 
 If sphinx is installed, build the documentation :
 
@@ -40,7 +43,7 @@ Browse it from http://localhost:8000/ with :
     $ cd doc/_build/html && python -m http.server
 
 Tests
-=====
+-----
 
 You can run unit tests by doing :
 
@@ -49,4 +52,4 @@ You can run unit tests by doing :
     $ cd ./tests
     $ python3 -m unittest -v
 
-It will look for ``tests`` directory and perform all tests in it.
+It will look for ``tests`` name based directories and perform all tests in them.
