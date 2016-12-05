@@ -29,7 +29,6 @@ class TestTransaction(unittest.TestCase):
     @contextlib.contextmanager
     def assert_error_message_raised(self, msc_function, expected_exception,
                                     return_value=0):
-
         def _create_mock(*pargs):
             mock = unittest.mock.Mock(return_value=return_value)
             return mock()
@@ -91,7 +90,7 @@ class TestTransaction(unittest.TestCase):
 
         if not os.path.isfile(filepath):
             with open(filepath, 'w') as f:
-                f.write("This is a body in a file\n")
+                f.write("This is a body in a file used for test purpose\n")
 
         self.transactions.get_request_body_from_file(filepath)
 
@@ -133,7 +132,7 @@ class TestTransaction(unittest.TestCase):
 
     def test_get_response_body(self):
         # Regular use of get_response_body_length() cannot be tested in unit
-        # test since libmodsecurity has to update the body to return its length.
+        # test since libmodsecurity has to update the body to return its content.
 
         # Body not updated
         self.assertEqual(self.transactions.get_response_body(), b"")
@@ -162,6 +161,7 @@ class TestTransaction(unittest.TestCase):
             self.transactions.process_response_body()
 
     def test_has_intervention(self):
+        # No intervention has to be done when nothing has been processed
         self.assertFalse(self.transactions.has_intervention())
 
     def test_process_logging(self):

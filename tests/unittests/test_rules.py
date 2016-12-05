@@ -63,7 +63,7 @@ class TestRules(unittest.TestCase):
 
         # Bad uri
         with self.assertRaises(InternalError):
-            self.rules_set.add_rules_remote(key, "fakeuri")
+            self.rules_set.add_rules_remote(key, "fake_uri")
 
         with self.assert_add_rules_error_message_raised("msc_rules_add_remote"):
             self.rules_set.add_rules_remote("test_of_assertion", "fake_uri")
@@ -73,7 +73,7 @@ class TestRules(unittest.TestCase):
         filename = "basic_rules.conf"
         filepath = os.path.abspath(os.path.dirname(__file__)) + "/" + filename
         retvalue = self.rules_set.add_rules_file(filepath)
-        self.assertEqual(retvalue, 6)
+        self.assertEqual(retvalue, 7)
 
         # Fake file name
         with self.assertRaises(InternalError):
