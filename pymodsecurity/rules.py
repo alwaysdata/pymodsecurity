@@ -51,7 +51,7 @@ class Rules:
 
         :param other_rules: an instance of :class:`Rules`
 
-        :return: number of rules merged
+        :return: number of rules merged as :class:`int`
         """
         return _lib.msc_rules_merge(self._rules_set,
                                     other_rules._rules_set)
@@ -66,8 +66,8 @@ class Rules:
         :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add_remote(self._rules_set,
-                                             key.encode(),
-                                             uri.encode(),
+                                             utils.as_bytes(key),
+                                             utils.as_bytes(uri),
                                              self._error_pointer)
         if retvalue == -1:
             raise InternalError(self._last_error_message())
@@ -82,7 +82,7 @@ class Rules:
         :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add_file(self._rules_set,
-                                           filename.encode(),
+                                           utils.as_bytes(filename),
                                            self._error_pointer)
         if retvalue == -1:
             raise InternalError(self._last_error_message())
@@ -98,7 +98,7 @@ class Rules:
         :return: number of rules merged as :class:`int`
         """
         retvalue = _lib.msc_rules_add(self._rules_set,
-                                      plain_rules.encode(),
+                                      utils.as_bytes(plain_rules),
                                       self._error_pointer)
         if retvalue == -1:
             raise InternalError(self._last_error_message())

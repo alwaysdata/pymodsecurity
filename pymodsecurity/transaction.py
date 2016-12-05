@@ -25,10 +25,15 @@ class Transaction:
     :param modsecurity: an instance of :class:`~modsecurity.ModSecurity`
     :param rules: an instance of :class:`~rules.Rules`
     """
-    def __init__(self, modsecurity, rules):
+    def __init__(self, modsecurity, rules, log_data=None):
         self._modsecurity = modsecurity
         self._rules = rules
-        self._log_callback_data = _NULL
+        if log_data is None:
+            log_data = _NULL
+        else:
+            log_data = _ffi.new_handle(log_data)
+        self._log_callback_data = log_data
+
         self._status = 0
         self._pause = 0
         self._disruptive = 0
@@ -54,7 +59,7 @@ class Transaction:
         objects are garbage collected.
         Otherwise it will end up in a segmentation fault.
         """
-        self._transaction_struct = _lib.msc_transaction_cleanup
+        _lib.msc_transaction_cleanup(self._transaction_struct)
 
     def process_connection(self,
                            client_ip, client_port,
@@ -94,7 +99,7 @@ class Transaction:
         :param method: an HTTP method
         :param http_version: a :class:`str` defining HTTP protocol version
 
-        .. note:: 
+        .. note::
             * Value consistency is not checked for ``method`` and
               ``http_version``.
             * Remember to check for a possible intervention
@@ -103,7 +108,7 @@ class Transaction:
         retvalue = _lib.msc_process_uri(self._transaction_struct,
                                         as_bytes(uri),
                                         as_bytes(method),
-                                        http_version.encode())
+                                        as_bytes(http_version))
         if not retvalue:
             raise ProcessConnectionError.failed_at("uri")
 
@@ -269,7 +274,7 @@ class Transaction:
         contents of the response body, otherwise there is no need to call this
         function.
 
-        :return: buffer as :class:`bytes` containing the response body
+        :return: buffer as :class:`str` containing the response body
         """
         returned_buffer = _lib.msc_get_response_body(self._transaction_struct)
         if returned_buffer == _NULL:
