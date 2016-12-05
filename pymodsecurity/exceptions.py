@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 pymodsecurity.exceptions
--------------------------
+------------------------
 """
 
 
 class Error(Exception):
     """
-    Base class for ModSecurity exception used by ``modsecurity``,
-    ``transaction`` and ``rules`` modules.
+    Base class for ModSecurity exception used by
+    :class:`~pymodsecurity.modsecurity`, :class:`~pymodsecurity.transaction`
+    and :class:`~pymodsecurity.rules` modules.
     """
     default_message = None
 
@@ -27,8 +28,8 @@ class InternalError(Error):
 
 class ProcessConnectionError(Error):
     """
-    Error raised when the C interface fails to perfom
-    the analysis on the connection.
+    Error raised when the C interface fails to perfom the analysis on the
+    connection.
     """
     default_message = "Failed to perform connection analysis"
 
@@ -39,22 +40,15 @@ class ProcessConnectionError(Error):
 
 class FeedingError(ProcessConnectionError):
     """
-    Error raised when the C interface fails to feed
-    ModSecurity with datas (e.g. request headers)
+    Error raised when the C interface fails to feed ModSecurity with datas
+    (e.g. request headers)
     """
     default_message = "Failed to feed ModSecurity"
 
 
-class EmptyBodyError(Error):
-    """
-    Error raised when a HTTP body is empty.
-    """
-    default_message = "Body is empty"
-
-
 class LoggingActionError(Error):
     """
-    Error raised when the C interface fails to log
-    all information realtive to a transaction.
+    Error raised when the C interface fails to log all information realtive to
+    a transaction.
     """
     default_message = "Failed to log information about the transaction"
