@@ -1,0 +1,2 @@
+.. automodule:: exceptions
+   :members:
