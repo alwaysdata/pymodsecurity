@@ -1,7 +1,10 @@
-.eggs/
+*.egg*/
+*.so*
 build/
 dist/
 doc/_build/
 __pycache__/
+*.py[oc]
 pymodsecurity.egg-info/
 tests/http_body_testfile
+*\~
