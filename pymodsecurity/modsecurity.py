@@ -38,7 +38,7 @@ class ModSecurity:
         :param callback: Python callable object
 
         .. note:: The callback should perform few operations or even none on
-            datas.
+            data.
 
         .. warning:: Be careful when writing the Python callback function. If
             it returns an object of the wrong type, or more generally raises
@@ -56,7 +56,7 @@ class ModSecurity:
             try:
                 return callback(data, utils.text(message))
             except:
-                pass
+                raise
 
         self._log_callback = _ffi.callback("void (*)(void *, const char *)",
                                            wrapper)

@@ -118,7 +118,8 @@ class Transaction:
 
         This function perform the analysis on the request headers, notice
         however that the headers should be added prior to the execution of
-        this function.
+        this function or :exc:`~exceptions.ProcessConnectionError` will be
+        raised.
 
         .. note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
@@ -151,10 +152,10 @@ class Transaction:
         inspection regarding the request body.
         There are two possibilities here:
 
-            1. Adds the buffer in a row
-            2. Adds it in chunks
+            - Adds the buffer in a row
+            - Adds it in chunks
 
-        :param body: body of a request
+        :param body: (chunk of the) body of a request
         """
         retvalue = _lib.msc_append_request_body(self._transaction_struct,
                                                 as_bytes(body),
@@ -182,7 +183,8 @@ class Transaction:
         isn't a body for inspect it is recommended to skip this step.
 
         It is necessary to append the request body prior to the execution of
-        this function.
+        this function or :exc:`~exceptions.ProcessConnectionError` will be
+        raised.
 
         .. note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.
@@ -197,7 +199,8 @@ class Transaction:
 
         This function perform the analysis on the response headers, notice
         however that the headers should be added prior to the execution of
-        this function.
+        this function or :exc:`~exceptions.ProcessConnectionError` will be
+        raised.
 
         :param statuscode: HTTP status code as :class:`int`
         :param protocol: protocol name with its version (e.g "HTTP 1.1")
@@ -236,7 +239,8 @@ class Transaction:
         isn't a body for inspect it is recommended to skip this step.
 
         It is necessary to append the response body prior to the execution of
-        this function.
+        this function or :exc:`~exceptions.ProcessConnectionError` will be
+        raised.
 
         .. note:: Remember to check for a possible intervention
             with :meth:`has_intervention()`.

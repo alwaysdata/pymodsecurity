@@ -40,8 +40,8 @@ class ProcessConnectionError(Error):
 
 class FeedingError(ProcessConnectionError):
     """
-    Error raised when the C interface fails to feed ModSecurity with datas
-    (e.g. request headers)
+    Error raised when the C interface fails to feed ModSecurity with data
+    (e.g. request headers).
     """
     default_message = "Failed to feed ModSecurity"
 

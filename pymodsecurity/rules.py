@@ -90,7 +90,7 @@ class Rules:
 
     def add_rules(self, plain_rules):
         """
-        Add custom rule defined by ``plain rules`` and merge it with the
+        Add custom rule defined by ``plain_rules`` and merge it with the
         current rules set.
 
         :param plain_rules: ModSecurity rule(s) as :class:`str`
