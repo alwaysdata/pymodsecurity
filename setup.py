@@ -36,6 +36,8 @@ setup_parameters = dict(
                       "sphinx_rtd_theme"],
     cffi_modules=["pymodsecurity/build_pymodsecurity.py:ffibuilder"],
     ext_package="pymodsecurity",
+
+    test_suite="tests",
 )
 
 
