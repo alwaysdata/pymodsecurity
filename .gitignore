@@ -1,0 +1,7 @@
+.eggs/
+build/
+dist/
+doc/_build/
+__pycache__/
+pymodsecurity.egg-info/
+tests/http_body_testfile
