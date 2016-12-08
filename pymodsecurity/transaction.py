@@ -152,8 +152,8 @@ class Transaction:
         inspection regarding the request body.
         There are two possibilities here:
 
-            - Adds the buffer in a row
-            - Adds it in chunks
+            - Add the buffer in a row
+            - Add it in chunks
 
         :param body: (chunk of the) body of a request
         """
