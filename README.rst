@@ -15,7 +15,8 @@ And optionally for the documentation:
   - sphinx
   - sphinx_rtd_theme
 
-Note :
+Note:
+
   - make sure that ``libmodsecurity`` version is 3.0.0 or greater.
   - all ``libmodsecurity.so`` files must be visible in standard library path,
     it can be done by using symlinks like so:
@@ -39,11 +40,11 @@ in ``/opt/libmodsecurity``), you can use it by doing:
 
         $ OPT=/opt/libmodsecurity
         $ LIBRARY_PATH=$OPT/lib LD_LIBRARY_PATH=$OPT/lib C_INCLUDE_PATH=$OPT/include python setup.py install
- 
+
 and later, invoke your python script using ``libmodsecurity`` with:
- 
+
 .. code-block:: bash
- 
+
         $ LD_LIBRARY_PATH=$OPT/lib python my_program.py
 
 
