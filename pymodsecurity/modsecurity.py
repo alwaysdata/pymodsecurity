@@ -44,7 +44,7 @@ class ModSecurity:
             it returns an object of the wrong type, or more generally raises
             an exception, the exception cannot be propagated. Instead, it is
             printed to stderr and the C-level callback is made to return a
-            default value.
+            default value (see CFFI callbacks documentation for details).
         """
         @functools.wraps(callback)
         def wrapper(data, message):
@@ -53,10 +53,7 @@ class ModSecurity:
             else:
                 data = _ffi.from_handle(data)
 
-            try:
-                return callback(data, utils.text(message))
-            except:
-                raise
+            return callback(data, utils.text(message))
 
         self._log_callback = _ffi.callback("void (*)(void *, const char *)",
                                            wrapper)
