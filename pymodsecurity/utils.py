@@ -8,7 +8,11 @@ _encoding = sys.getdefaultencoding()
 
 
 def as_bytes(arg, encoding=_encoding):
-    return bytes(arg, encoding)
+    try:
+        return bytes(arg, encoding)
+    except TypeError:
+        # ``arg`` is not a :class:`str`
+        return arg
 
 
 def text(charp):
