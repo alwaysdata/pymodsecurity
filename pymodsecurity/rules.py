@@ -21,11 +21,13 @@ class Rules:
     Wrapper for C function built from **rules.h** via CFFI.
     """
     def __init__(self,):
-        _rules_set = _lib.msc_create_rules_set()
-        assert _rules_set != _NULL
-        self._rules_set = _ffi.gc(_rules_set, _lib.msc_rules_cleanup)
+        self._rules_set = _lib.msc_create_rules_set()
+        assert self._rules_set != _NULL
 
         self._error_pointer = _ffi.new("const char **", _NULL)
+
+    def __del__(self):
+        _lib.msc_rules_cleanup(self._rules_set)
 
     def _last_error_message(self):
         """

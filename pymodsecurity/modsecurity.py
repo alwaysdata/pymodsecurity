@@ -13,6 +13,7 @@ from pymodsecurity._modsecurity import ffi as _ffi
 from pymodsecurity._modsecurity import lib as _lib
 from pymodsecurity import utils
 
+
 _NULL = _ffi.NULL
 
 
@@ -21,12 +22,13 @@ class ModSecurity:
     Wrapper for C function built from **modsecurity.h** via CFFI.
     """
     def __init__(self,):
-        _modsecurity_struct = _lib.msc_init()
-        assert _modsecurity_struct != _NULL
-        self._modsecurity_struct = _ffi.gc(_modsecurity_struct,
-                                           _lib.msc_cleanup)
+        self._modsecurity_struct = _lib.msc_init()
+        assert self._modsecurity_struct != _NULL
 
         self._log_callback = _NULL
+
+    def __del__(self):
+        _lib.msc_cleanup(self._modsecurity_struct)
 
     def set_log_callback(self, callback):
         """
