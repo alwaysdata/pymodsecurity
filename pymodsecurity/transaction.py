@@ -332,3 +332,21 @@ class Transaction:
         retvalue = _lib.msc_process_logging(self._transaction_struct)
         if not retvalue:
             raise LoggingActionError
+
+    def get_collection_value(self, key):
+        """
+        Retrieve the value associated to ``key`` in the collection object
+        referenced by the transaction structure into libmodsecurity.
+
+        :param key: collection key as :class:`str` :class:`bytes`
+
+        :return: value associated to ``key`` as :class:`bytes`, ``None`` if the
+            key has not been found
+        """
+        value = _lib.msc_get_collection_value(self._transaction_struct,
+                                              as_bytes(key))
+
+        if value == _NULL:
+            return None
+        else:
+            return _ffi.string(value)

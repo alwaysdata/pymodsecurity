@@ -170,3 +170,14 @@ class TestTransaction(unittest.TestCase):
         with self.assert_error_message_raised("msc_process_logging",
                                               LoggingActionError):
             self.transactions.process_logging()
+
+    def test_get_collection_value(self):
+        self.transactions.add_request_header("Expect", "100-continue")
+        self.transactions.process_request_headers()
+
+        key_always_available = "ARGS_COMBINED_SIZE"
+        retvalue = self.transactions.get_collection_value(key_always_available)
+        self.assertNotEqual(retvalue, None)
+
+        retvalue = self.transactions.get_collection_value("fake_key")
+        self.assertEqual(retvalue, None)

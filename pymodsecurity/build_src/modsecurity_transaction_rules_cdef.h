@@ -73,6 +73,8 @@ int msc_get_response_body_length(Transaction *transaction);
 void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 int msc_process_logging(Transaction *transaction);
+const char* msc_get_collection_value(Transaction *transaction,
+				     const char *key);
 
 /*
  * rules.h section
