@@ -13,7 +13,7 @@ __all__ = ["__author__",
            "__uri__",
            "__version__"]
 
-__version__ = "1.0.0.dev1"
+__version__ = "1.0.0"
 
 __title__ = "pymodsecurity"
 __uri__ = "https://github.com/alwaysdata/pymodsecurity"

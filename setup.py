@@ -24,6 +24,7 @@ setup_parameters = dict(
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
 
         "Topic :: Security",
@@ -34,7 +35,8 @@ setup_parameters = dict(
     setup_requires=["cffi>=1.8.0"],
     install_requires=["cffi>=1.8.0",
                       "sphinx_rtd_theme"],
-    cffi_modules=["pymodsecurity/build_pymodsecurity.py:ffibuilder"],
+    cffi_modules=["src/pymodsecurity/build_pymodsecurity.py:ffibuilder"],
+    package_dir={"pymodsecurity": "src/pymodsecurity"},
     ext_package="pymodsecurity",
 
     test_suite="tests",
