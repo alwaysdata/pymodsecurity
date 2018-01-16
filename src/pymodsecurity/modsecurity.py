@@ -50,6 +50,7 @@ class ModSecurity:
         """
         @functools.wraps(callback)
         def wrapper(data, message):
+            message = _ffi.cast("char *", message)
             if data == _NULL:
                 data = None
             else:
@@ -57,7 +58,7 @@ class ModSecurity:
 
             return callback(data, utils.text(message))
 
-        self._log_callback = _ffi.callback("void (*)(void *, const char *)",
+        self._log_callback = _ffi.callback("void (*)(void *, const void *)",
                                            wrapper)
         _lib.msc_set_log_cb(self._modsecurity_struct,
                             self._log_callback)

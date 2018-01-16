@@ -56,7 +56,8 @@ class Rules:
         :return: number of rules merged as :class:`int`
         """
         return _lib.msc_rules_merge(self._rules_set,
-                                    other_rules._rules_set)
+                                    other_rules._rules_set,
+                                    self._error_pointer)
 
     def add_rules_remote(self, key, uri):
         """

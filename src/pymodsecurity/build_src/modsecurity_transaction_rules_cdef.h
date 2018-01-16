@@ -4,7 +4,7 @@
  *
  * Building references :
  *     - libmodsecurity version : v3.0.0
- *     - commit hash : 47f2e7f
+ *     - commit hash : c1cd668 (commited on 2017-12-13)
  */
 
 
@@ -13,12 +13,12 @@
  */
 
 typedef struct ModSecurity_t ModSecurity;
-typedef void (*LogCb) (void *, const char *);
+typedef void (*ModSecLogCb) (void *, const void *);
 
 ModSecurity *msc_init(void);
 const char *msc_who_am_i(ModSecurity *msc);
 void msc_set_connector_info(ModSecurity *msc, const char *connector);
-void msc_set_log_cb(ModSecurity *msc, LogCb cb);
+void msc_set_log_cb(ModSecurity *msc, ModSecLogCb cb);
 void msc_cleanup(ModSecurity *msc);
 
 /*
@@ -69,7 +69,7 @@ int msc_process_uri(Transaction *transaction,
 		    const char *protocol,
 		    const char *http_version);
 const char *msc_get_response_body(Transaction *transaction);
-int msc_get_response_body_length(Transaction *transaction);
+size_t msc_get_response_body_length(Transaction *transaction);
 void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 int msc_process_logging(Transaction *transaction);
@@ -84,7 +84,7 @@ typedef struct Rules_t Rules;
 
 Rules *msc_create_rules_set(void);
 void msc_rules_dump(Rules *rules);
-int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
+int msc_rules_merge(Rules *rules_dst, Rules *rules_from, const char **error);
 int msc_rules_add_remote(Rules *rules,
 			 const char *key,
 			 const char *uri,
