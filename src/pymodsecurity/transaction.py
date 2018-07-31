@@ -54,20 +54,8 @@ class Transaction:
             self._log_callback_data)
         assert self._transaction_struct != _NULL
 
-        # At garbage collection, transaction structure MUST be deleted first.
-        # Otherwise you will most likely end up with a segmentation fault.
-        # This behavior is due to libmodsecurity logging implementation,
-        # ``msc_transaction_cleanup`` C function calls destructor of
-        # ``Transaction`` (C++) object, during destruction ``Modsecurity``
-        # (C++) object have to be alive for logging purpose. Hence
-        # ``ModSecurity`` python object must not be garbage collected before
-        # the ``Transaction`` one.
-        # The only way to ensure this deletion ordrer is to use a weak
-        # reference finalizer since its callback will be called before any
-        # __del__ method during garbage collection phase.
-        # For details see PEP 442 (https://www.python.org/dev/peps/pep-0442/)
-        weakref.finalize(
-            self, _lib.msc_transaction_cleanup, self._transaction_struct)
+    def __del__(self):
+        _lib.msc_transaction_cleanup(self._transaction_struct)
 
     def process_connection(self,
                            client_ip, client_port,
