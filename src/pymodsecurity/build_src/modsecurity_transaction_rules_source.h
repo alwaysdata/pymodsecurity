@@ -123,6 +123,7 @@ int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 int msc_process_logging(Transaction *transaction);
 const char* msc_get_collection_value(Transaction *transaction,
 				     const char *key);
+const char* msc_get_matched_rules_messages(Transaction *transaction);
 
 /*
  * rules.h section

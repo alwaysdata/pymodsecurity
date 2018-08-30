@@ -6,7 +6,7 @@ pymodsecurity.transaction
 Provide a class :class:`Transaction` gathering methods coming from
 libmodsecurity.
 """
-
+import sys
 import weakref
 
 from pymodsecurity._modsecurity import ffi as _ffi
@@ -333,6 +333,20 @@ class Transaction:
         """
         value = _lib.msc_get_collection_value(self._transaction_struct,
                                               as_bytes(key))
+
+        if value == _NULL:
+            return None
+        else:
+            return _ffi.string(value)
+
+    def get_matched_rules_messages(self):
+        """
+        Retrieve the messages associated to each matched rules.
+
+        :return: rules messages as :class:`bytes` separated by a newline
+            character
+        """
+        value = _lib.msc_get_matched_rules_messages(self._transaction_struct)
 
         if value == _NULL:
             return None
