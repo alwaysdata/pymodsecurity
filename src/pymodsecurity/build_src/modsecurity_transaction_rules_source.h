@@ -2,8 +2,8 @@
  * Source file used for building CFFI module
  *
  * Building references :
- *     - libmodsecurity version : v3.0.2 (+2 commits)
- *     - commit hash : 8285a97 (commited on 2018-04-04)
+ *     - libmodsecurity version : v3.0.3
+ *     - commit hash : 4e6e424 (commited on 2018-11-01)
  */
 
 
@@ -32,7 +32,7 @@ typedef struct ModSecurity_t ModSecurity;
 
 #define MODSECURITY_MAJOR "3"
 #define MODSECURITY_MINOR "0"
-#define MODSECURITY_PATCHLEVEL "2"
+#define MODSECURITY_PATCHLEVEL "3"
 #define MODSECURITY_TAG ""
 #define MODSECURITY_TAG_NUM "100"
 

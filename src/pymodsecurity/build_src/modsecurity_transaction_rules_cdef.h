@@ -3,8 +3,8 @@
  * This file must NOT containe `#include` directives.
  *
  * Building references :
- *     - libmodsecurity version : v3.0.2 (+2 commits)
- *     - commit hash : 8285a97 (commited on 2018-04-04)
+ *     - libmodsecurity version : v3.0.3
+ *     - commit hash : 4e6e424 (commited on 2018-11-01)
  */
 
 
