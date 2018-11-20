@@ -321,34 +321,22 @@ class Transaction:
         if not retvalue:
             raise LoggingActionError
 
-    def get_collection_value(self, key):
+    def get_matched_rules_info(self):
         """
-        Retrieve the value associated to ``key`` in the collection object
-        referenced by the transaction structure into libmodsecurity.
+        Retrieve the info associated to each matched rule. This include for
+        each rule the the ID, the anomaly score, a message and the parameter
+        which tiggered it.
 
-        :param key: collection key as :class:`str` :class:`bytes`
-
-        :return: value associated to ``key`` as :class:`bytes`, ``None`` if the
-            key has not been found
+        :return: :class:`list` of rule info contained in a :class:`tuple`
+            formatted as ``(ID, score, message, parameter)``, ``None`` if no
+            rules have been matched
         """
-        value = _lib.msc_get_collection_value(self._transaction_struct,
-                                              as_bytes(key))
+        value = _lib.msc_get_matched_rules_info(self._transaction_struct)
 
-        if value == _NULL:
-            return None
-        else:
-            return _ffi.string(value)
-
-    def get_matched_rules_messages(self):
-        """
-        Retrieve the messages associated to each matched rules.
-
-        :return: rules messages as :class:`bytes` separated by a newline
-            character
-        """
-        value = _lib.msc_get_matched_rules_messages(self._transaction_struct)
-
-        if value == _NULL:
-            return None
-        else:
-            return _ffi.string(value)
+        result = []
+        for i in range(value.size):
+            result.append((value.rules_info[i].id,
+                           value.rules_info[i].score,
+                           _ffi.string(value.rules_info[i].message),
+                           _ffi.string(value.rules_info[i].parameter)))
+        return result

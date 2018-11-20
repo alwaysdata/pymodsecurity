@@ -36,6 +36,17 @@ typedef struct ModSecurityIntervention_t {
 typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
 
+struct RuleInfo {
+    int64_t id;
+    int score;
+    const char* message;
+    const char* parameter;
+};
+
+struct RulesInfo {
+    struct RuleInfo* rules_info;
+    long unsigned int size;
+};
 
 Transaction *msc_new_transaction(ModSecurity *ms,
 				 Rules *rules,
@@ -73,9 +84,7 @@ size_t msc_get_response_body_length(Transaction *transaction);
 void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 int msc_process_logging(Transaction *transaction);
-const char* msc_get_collection_value(Transaction *transaction,
-				     const char *key);
-const char* msc_get_matched_rules_messages(Transaction *transaction);
+struct RulesInfo msc_get_matched_rules_info(Transaction *transaction);
 
 /*
  * rules.h section

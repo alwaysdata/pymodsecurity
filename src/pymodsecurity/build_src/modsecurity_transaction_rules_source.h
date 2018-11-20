@@ -67,6 +67,18 @@ typedef struct ModSecurityIntervention_t ModsecurityIntervention;
 typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
 
+struct RuleInfo {
+    int64_t id;
+    int score;
+    const char* message;
+    const char* parameter;
+};
+
+struct RulesInfo {
+    struct RuleInfo* rules_info;
+    long unsigned int size;
+};
+
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
     if (b == NULL) { \
@@ -121,9 +133,7 @@ size_t msc_get_response_body_length(Transaction *transaction);
 void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 int msc_process_logging(Transaction *transaction);
-const char* msc_get_collection_value(Transaction *transaction,
-				     const char *key);
-const char* msc_get_matched_rules_messages(Transaction *transaction);
+struct RulesInfo msc_get_matched_rules_info(Transaction *transaction);
 
 /*
  * rules.h section
