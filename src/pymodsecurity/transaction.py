@@ -6,8 +6,6 @@ pymodsecurity.transaction
 Provide a class :class:`Transaction` gathering methods coming from
 libmodsecurity.
 """
-import sys
-import weakref
 
 from pymodsecurity._modsecurity import ffi as _ffi
 from pymodsecurity._modsecurity import lib as _lib
